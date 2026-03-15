@@ -1,9 +1,7 @@
 <?php
-// --- PHP LOGIC FOR ACTIVE PAGE & USER INITIALS ---
 $current_uri = $_SERVER['REQUEST_URI'];
 function isActive($path) {
     global $current_uri;
-    // Make dashboard active for both "/" and "/dashboard"
     if ($path === '/dashboard' && ($current_uri === '/dashboard' || $current_uri === '/')) return true;
     if ($path !== '/dashboard' && strpos($current_uri, $path) === 0) return true;
     return false;
@@ -31,7 +29,6 @@ if ($user_name !== 'Guest') {
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/css/bootstrap.min.css" integrity="sha512-2bBQCjcnw658Lho4nlXJcc6WkV/UxpE/sAokbXPxQNGqmNdQrWqtw26Ns9kFF/yG792pKR1Sx8/Y1Lf1XN4GKA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-    <!-- Instant Theme-Applying Script -->
     <script>
         (function() {
             function applyTheme(theme) {
@@ -44,11 +41,10 @@ if ($user_name !== 'Guest') {
         })();
     </script>
 
-    <!-- GLOBAL STYLES (Your Application's Design System) -->
     <style>
         /* CSS Variables (Single Source of Truth) */
         :root {
-            --brand-color: #007bff; --brand-hover: #0056b3; --brand-color-light: #cfe8ff;
+            --brand-color: #C9A227; --brand-hover: #a8861e; --brand-color-light: #fdf4d9;
             --header-bg: #ffffff; --header-border: #e5e7eb; --body-bg: #f4f7f6;
             --card-bg: #ffffff; --card-border: #e5e7eb; --input-bg: #f3f4f6;
             --text-primary: #1f2d37; --text-secondary: #6b7280; --text-light: #ffffff;
@@ -56,10 +52,10 @@ if ($user_name !== 'Guest') {
             --danger-color: #dc2626; --danger-bg: #fee2e2; --danger-text: #b91c1c;
             --warning-color: #facc15; --warning-bg: #fef9c3; --warning-text: #854d0e;
             --disabled-bg: #d1d5db; --disabled-text: #6b7280;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05); --shadow-md: 0 4px 12px rgba(0, 123, 255, 0.15);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05); --shadow-md: 0 4px 12px rgba(201,162,39,0.15);
         }
         .dark-theme {
-            --brand-color-light: #1d4ed8;
+            --brand-color: #4ade80; --brand-hover: #22c55e; --brand-color-light: #14532d;
             --header-bg: #1f2937; --header-border: #374151; --body-bg: #111827;
             --card-bg: #1f2937; --card-border: #374151; --input-bg: #374151;
             --text-primary: #f9fafb; --text-secondary: #d1d5db;
@@ -67,7 +63,7 @@ if ($user_name !== 'Guest') {
             --danger-color: #ef4444; --danger-bg: #5f1818; --danger-text: #fca5a5;
             --warning-color: #facc15; --warning-bg: #42310b; --warning-text: #fef08a;
             --disabled-bg: #374151; --disabled-text: #9ca3af;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.3); --shadow-md: 0 4px 12px rgba(0, 123, 255, 0.25);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.3); --shadow-md: 0 4px 12px rgba(74,222,128,0.25);
         }
 
         /* Universal Box Sizing & Global Layout */
@@ -185,7 +181,6 @@ if ($user_name !== 'Guest') {
     </div>
 </header>
 
-<!-- NEW & IMPROVED Mobile Off-Canvas Navigation -->
 <div id="mobile-nav-overlay" class="mobile-nav-overlay"></div>
 <div id="mobile-nav" class="mobile-nav">
     <div class="mobile-nav-header">

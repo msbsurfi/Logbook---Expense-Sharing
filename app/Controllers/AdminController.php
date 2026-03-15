@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../Lib/Mailer.php';
 require_once __DIR__ . '/../Lib/Security.php';
 require_once __DIR__ . '/../Lib/Logger.php';
+require_once __DIR__ . '/../Lib/EmailTemplate.php';
 
 class AdminController {
     private $userModel;
@@ -11,7 +12,6 @@ class AdminController {
 
     public function __construct(){
         Security::ensureSession();
-        // Check if user is logged in AND is admin
         if (!isset($_SESSION['user_id']) || ($_SESSION['user_role'] ?? '') !== 'admin'){
             $_SESSION['flash_error'] = "Admin access required.";
             header('Location:/dashboard');
@@ -23,27 +23,21 @@ class AdminController {
         $this->logger = new Logger();
     }
 
-    // =========================================================
-    // MAIN VIEW (Combined Dashboard, Users, Logs)
-    // =========================================================
     public function index() {
         $tab = $_GET['tab'] ?? 'dashboard';
-        $validTabs = ['dashboard', 'users', 'logs'];
+        $validTabs = ['dashboard', 'users', 'logs', 'settings'];
         if (!in_array($tab, $validTabs)) $tab = 'dashboard';
     
         $data = ['tab' => $tab];
         $page = max(1, (int)($_GET['page'] ?? 1));
     
-        // 1. Fetch Data based on Active Tab
         switch ($tab) {
             case 'dashboard':
-                // Dashboard specific data
                 $data['pending'] = $this->userModel->getPendingUsers();
                 $data['stats'] = $this->collectStats(); 
                 break;
     
             case 'users':
-                // User Management Logic
                 $perPage = 25;
                 $filters = [
                     'role'   => $this->sanitizeFilter($_GET['role'] ?? ''),
@@ -59,7 +53,6 @@ class AdminController {
                 break;
     
             case 'logs':
-                // Audit Logs Logic
                 $perPage = 50;
                 $offset = ($page - 1) * $perPage;
                 
@@ -79,35 +72,34 @@ class AdminController {
                 $data['totalActions'] = $totalActions;
                 $data['page'] = $page;
                 break;
+
+            case 'settings':
+                $data['mailConfig'] = [
+                    'host'       => SMTP_HOST,
+                    'user'       => SMTP_USER,
+                    'port'       => SMTP_PORT,
+                    'from_email' => SMTP_FROM_EMAIL,
+                    'from_name'  => SMTP_FROM_NAME,
+                    'secure'     => SMTP_SECURE ?? 'ssl',
+                ];
+                break;
         }
     
-        // 2. Load the Single View
         require_once __DIR__ . '/../Views/admin/index.php';
     }
 
-    // =========================================================
-    // HELPER METHODS (Private)
-    // =========================================================
-
-    /**
-     * Collects statistics for the dashboard
-     */
     private function collectStats(){
         $db = new Database();
         
-        // Total Transactions & Sum
         $db->query("SELECT COUNT(*) AS total_tx, SUM(amount) AS sum_amt FROM transactions");
         $all = $db->fetchOne();
 
-        // Weekly Stats
         $db->query("SELECT COUNT(*) AS weekly_tx, SUM(amount) AS weekly_sum FROM transactions WHERE created_at >= (NOW() - INTERVAL 7 DAY)");
         $wk = $db->fetchOne();
 
-        // Monthly Stats
         $db->query("SELECT COUNT(*) AS monthly_tx, SUM(amount) AS monthly_sum FROM transactions WHERE created_at >= (NOW() - INTERVAL 30 DAY)");
         $mo = $db->fetchOne();
 
-        // Email Stats
         $db->query("SELECT COUNT(*) AS weekly_emails FROM email_log WHERE sent_at >= (NOW() - INTERVAL 7 DAY)");
         $we = $db->fetchOne();
         $db->query("SELECT COUNT(*) AS monthly_emails FROM email_log WHERE sent_at >= (NOW() - INTERVAL 30 DAY)");
@@ -126,7 +118,6 @@ class AdminController {
     }
 
     private function sanitizeFilter($value){
-        // Only allow alphanumeric and underscore
         return preg_replace('/[^a-zA-Z0-9_]/', '', trim($value));
     }
 
@@ -140,17 +131,12 @@ class AdminController {
 
     private function redirectBack() {
         $referer = $_SERVER['HTTP_REFERER'] ?? '/admin';
-        // Ensure we don't redirect to an external site
         if (strpos($referer, $_SERVER['HTTP_HOST']) === false) {
              $referer = '/admin';
         }
         header("Location: $referer");
         exit();
     }
-
-    // =========================================================
-    // ACTIONS (User Management)
-    // =========================================================
 
     public function approve($id){
         $this->checkCsrf();
@@ -208,10 +194,6 @@ class AdminController {
         $this->redirectBack();
     }
 
-    // =========================================================
-    // IMPERSONATION
-    // =========================================================
-
     public function impersonate($id){
         $this->checkCsrf();
         if ($id == $_SESSION['user_id']) {
@@ -219,7 +201,6 @@ class AdminController {
             $this->redirectBack();
         }
 
-        // Store original admin ID if not already stored
         if (empty($_SESSION['impersonator_admin_id'])) {
             $_SESSION['impersonator_admin_id'] = $_SESSION['user_id'];
         }
@@ -227,42 +208,27 @@ class AdminController {
         $_SESSION['user_id'] = $id;
         $this->logger->logAdminAction($_SESSION['impersonator_admin_id'], 'start_impersonation', ['target_id' => $id]);
         $_SESSION['flash_success'] = "Now viewing as user ID: $id";
-        header('Location: /dashboard'); // Go to user dashboard
+        header('Location: /dashboard');
         exit();
     }
 
     public function stopImpersonation(){
-        // Check CSRF
-        if (!Security::validateCsrf($_POST['csrf_token'] ?? '')) {
-            // Even if token fails, if we are in a broken state, let's try to recover session if admin id exists
-            // But for security, we usually strictly require it. 
-            // In impersonation mode, the dashboard might generate a token for the *impersonated* user, 
-            // so validation might be tricky depending on how Security class generates tokens (based on session ID or user ID).
-            // Assuming token logic is standard:
-        }
-        
         if (!empty($_SESSION['impersonator_admin_id'])) {
             $adminId = $_SESSION['impersonator_admin_id'];
-            
-            // Restore session
+
             $_SESSION['user_id'] = $adminId;
-            // Ensure role is admin
-            $_SESSION['user_role'] = 'admin'; 
-            
+            $_SESSION['user_role'] = 'admin';
+
             $this->logger->logAdminAction($adminId, 'stop_impersonation', ['target_id' => $_SESSION['user_id']]);
 
             unset($_SESSION['impersonator_admin_id']);
-            
+
             $_SESSION['flash_success'] = "Welcome back, Admin.";
             header('Location: /admin');
             exit();
         }
         header('Location: /dashboard');
     }
-
-    // =========================================================
-    // DATA & EXPORTS
-    // =========================================================
 
     public function analyticsData(){
         header('Content-Type: application/json');
@@ -371,6 +337,60 @@ class AdminController {
         }
         fclose($out);
         $this->logger->logAdminAction($_SESSION['user_id'], 'export_expenses_csv', ['count' => count($rows)]);
+        exit();
+    }
+
+    public function saveSettings(){
+        $this->checkCsrf();
+        $host      = trim($_POST['smtp_host'] ?? '');
+        $user      = filter_var(trim($_POST['smtp_user'] ?? ''), FILTER_VALIDATE_EMAIL);
+        $pass      = $_POST['smtp_pass'] ?? '';
+        $port      = (int)($_POST['smtp_port'] ?? 465);
+        $fromEmail = filter_var(trim($_POST['smtp_from_email'] ?? ''), FILTER_VALIDATE_EMAIL);
+        $fromName  = preg_replace('/[^a-zA-Z0-9 _\-]/', '', trim($_POST['smtp_from_name'] ?? 'Logbook'));
+        $secure    = in_array($_POST['smtp_secure'] ?? 'ssl', ['ssl', 'tls']) ? $_POST['smtp_secure'] : 'ssl';
+
+        if (!preg_match('/^[a-zA-Z0-9.\-]+$/', $host)) {
+            $_SESSION['flash_error'] = 'SMTP host must be a valid hostname (letters, digits, dots, hyphens only).';
+            header('Location:/admin?tab=settings');
+            exit();
+        }
+
+        if ($port < 1 || $port > 65535) {
+            $_SESSION['flash_error'] = 'SMTP port must be between 1 and 65535.';
+            header('Location:/admin?tab=settings');
+            exit();
+        }
+
+        if (!$host || !$user || !$fromEmail){
+            $_SESSION['flash_error'] = 'Host, a valid SMTP username email, and a valid from-email are required.';
+            header('Location:/admin?tab=settings');
+            exit();
+        }
+
+        if (empty($pass)){
+            $pass = SMTP_PASS;
+        }
+
+        $configPath = __DIR__ . '/../../config/mail.php';
+        $content = "<?php\n"
+            . "define('SMTP_HOST', " . var_export($host, true) . ");\n"
+            . "define('SMTP_USER', " . var_export($user, true) . ");\n"
+            . "define('SMTP_PASS', " . var_export($pass, true) . ");\n"
+            . "define('SMTP_PORT', " . $port . ");\n"
+            . "define('SMTP_FROM_EMAIL', " . var_export($fromEmail, true) . ");\n"
+            . "define('SMTP_FROM_NAME', " . var_export($fromName, true) . ");\n"
+            . "define('SMTP_SECURE', " . var_export($secure, true) . ");\n";
+
+        if (file_put_contents($configPath, $content) !== false){
+            $this->logger->logAdminAction($_SESSION['user_id'], 'update_mail_settings', [
+                'host' => $host, 'user' => $user, 'port' => $port
+            ]);
+            $_SESSION['flash_success'] = 'Mail settings updated successfully.';
+        } else {
+            $_SESSION['flash_error'] = 'Could not write configuration file. Check file permissions.';
+        }
+        header('Location:/admin?tab=settings');
         exit();
     }
 }

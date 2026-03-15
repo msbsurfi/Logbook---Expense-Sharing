@@ -53,15 +53,10 @@ switch($parts[0]){
         
     case 'friends':
         $fc = new FriendController();
-        // Handle Send
         if (isset($parts[1]) && $parts[1]==='send') $fc->sendRequest();
-        // Handle Response (Accept/Decline)
         elseif (isset($parts[1]) && $parts[1]==='respond' && isset($parts[2]) && isset($parts[3])) $fc->respond($parts[2], $parts[3]);
-        // Handle Unfriend
         elseif (isset($parts[1]) && $parts[1]==='unfriend' && isset($parts[2])) $fc->unfriend($parts[2]);
-        // Handle Cancel Request (Added this for the Sent Requests feature)
         elseif (isset($parts[1]) && $parts[1]==='cancel' && isset($parts[2])) $fc->cancelRequest($parts[2]);
-        // Default View
         else $fc->index();
         break;
         
@@ -84,12 +79,10 @@ switch($parts[0]){
     case 'admin':
         $ac = new AdminController();
         
-        // If just '/admin', show the main combined index view
         if (!isset($parts[1])) {
             $ac->index();
         } else {
             switch ($parts[1]) {
-                // Actions (POST)
                 case 'approve':
                     if (isset($parts[2])) $ac->approve($parts[2]);
                     break;
@@ -115,7 +108,6 @@ switch($parts[0]){
                     if ($_SERVER['REQUEST_METHOD']==='POST') $ac->stopImpersonation();
                     break;
                     
-                // Data & Exports
                 case 'analytics-data':
                     $ac->analyticsData();
                     break;
@@ -128,12 +120,15 @@ switch($parts[0]){
                 case 'export-expenses-csv':
                     $ac->exportExpensesCsv();
                     break;
+                case 'settings':
+                    if (isset($parts[2]) && $parts[2] === 'save' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+                        $ac->saveSettings();
+                    } else {
+                        $ac->index();
+                    }
+                    break;
                     
-                // Default fallback (e.g. /admin/logs -> redirects or handles via index if needed)
                 default:
-                    // If a specific legacy URL like /admin/logs is hit, we can either
-                    // redirect to /admin?tab=logs or handle it here. 
-                    // Since the controller expects $_GET['tab'], the clean way is to rely on /admin?tab=...
                     $ac->index(); 
                     break;
             }

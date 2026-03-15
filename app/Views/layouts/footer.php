@@ -1,7 +1,6 @@
-</div> <!-- This closes the .container div opened in header.php -->
+</div> <?php /* closes .container from header.php */ ?>
 </main>
 
-<!-- Global HTML Elements -->
 <div id="global-loading-overlay" class="loading-overlay">
     <div class="loading-box">
         <div class="spinner"></div>
@@ -10,49 +9,116 @@
 </div>
 <div class="toast-stack"></div>
 
-<!-- Site Footer HTML -->
 <footer class="site-footer">
     <div class="container">
-        &copy; <?php echo date('Y'); ?> LogBook. All rights reserved.
+        <div class="footer-brand">
+            <span class="footer-logo">L</span>
+            <strong>Logbook</strong>
+        </div>
+        <p class="footer-copy">&copy; <?php echo date('Y'); ?> Logbook. All rights reserved.</p>
+        <div class="footer-links">
+            <span>Account &amp; Support:
+                <a href="mailto:info@logbook.msbsu.com">info@logbook.msbsu.com</a>
+            </span>
+            <span class="footer-sep">&bull;</span>
+            <span>Report Abuse:
+                <a href="mailto:abuse@logbook.msbsu.com">abuse@logbook.msbsu.com</a>
+            </span>
+        </div>
+        <p class="footer-delete-note">
+            To delete your account, please settle all transactions then email us.
+        </p>
     </div>
 </footer>
 
-<div style="text-align: center; color: #333; line-height: 1; max-width: 800px; margin: 15px auto; border: 1px solid #a0a0a0; padding: 10px; border-radius: 6px; font-size: 10px;">
-
-    <p style="margin: 0 0 10px 0; font-weight: bold; font-size: 12px; color: #1a1a1a;">Account & Support</p>
-
-    <hr style="border: 0; height: 1px; background-color: #e0e0e0; margin: 10px 0;">
-
-    <p style="margin-bottom: 8px;">
-        <strong style="color: #d9534f;">To Delete Your Account:</strong> Please settle up all your transactions and then email
-        <a href="mailto:info@logbook.msbsu.com" style="color: #007bff; text-decoration: none;">
-            info@logbook.msbsu.com
-        </a>
-    </p>
-
-    <p style="margin: 0;">
-        <strong style="color: #f0ad4e;">To Report Abuse:</strong> Please email (with screenshots, if available)
-        <a href="mailto:abuse@logbook.msbsu.com" style="color: #007bff; text-decoration: none;">
-            abuse@logbook.msbsu.com
-        </a>
-    </p>
-
-</div>
-
-<!-- Self-Contained Styles for Footer Elements -->
 <style>
-    .site-footer { background-color: var(--header-bg); padding: 24px 0; border-top: 1px solid var(--header-border); text-align: center; color: var(--text-secondary); flex-shrink: 0; }
-    .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0.8); z-index: 9999; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; }
-    .dark-theme .loading-overlay { background-color: rgba(17, 24, 39, 0.8); }
+    .site-footer {
+        background-color: var(--header-bg);
+        border-top: 3px solid var(--brand-color);
+        padding: 32px 0 24px;
+        text-align: center;
+        color: var(--text-secondary);
+        flex-shrink: 0;
+        margin-top: 24px;
+    }
+    .footer-brand {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+    .footer-logo {
+        background-color: var(--brand-color);
+        color: #fff;
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.9rem;
+    }
+    .footer-brand strong {
+        font-size: 1rem;
+        color: var(--text-primary);
+    }
+    .footer-copy {
+        margin: 0 0 10px;
+        font-size: 0.85rem;
+    }
+    .footer-links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 6px 16px;
+        font-size: 0.8rem;
+        margin-bottom: 8px;
+    }
+    .footer-links a {
+        color: var(--brand-color);
+        text-decoration: none;
+    }
+    .footer-links a:hover {
+        text-decoration: underline;
+    }
+    .footer-sep {
+        color: var(--card-border);
+    }
+    .footer-delete-note {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        margin: 0;
+        opacity: 0.7;
+    }
+    .loading-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background-color: rgba(255,255,255,0.85); z-index: 9999;
+        display: flex; justify-content: center; align-items: center;
+        opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s;
+    }
+    .dark-theme .loading-overlay { background-color: rgba(17,24,39,0.85); }
     .loading-overlay.show { opacity: 1; visibility: visible; }
     .loading-box { display: flex; flex-direction: column; align-items: center; gap: 16px; color: var(--text-primary); }
-    .spinner { width: 48px; height: 48px; border: 4px solid var(--header-border); border-top-color: var(--brand-color); border-radius: 50%; animation: spin 1s linear infinite; }
+    .spinner {
+        width: 48px; height: 48px; border: 4px solid var(--header-border);
+        border-top-color: var(--brand-color); border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
     @keyframes spin { to { transform: rotate(360deg); } }
     .toast-stack { position: fixed; top: 80px; right: 24px; z-index: 10000; display: flex; flex-direction: column; gap: 12px; }
-    .toast { display: flex; align-items: flex-start; padding: 16px; border-radius: 8px; background-color: var(--header-bg); box-shadow: var(--shadow-md); width: 350px; max-width: 90vw; border-left: 4px solid; animation: slideIn 0.3s ease-out, fadeOut 0.5s ease-in 4.5s forwards; }
-    .toast.success { border-left-color: var(--success-color); } .toast.error { border-left-color: var(--danger-color); }
+    .toast {
+        display: flex; align-items: flex-start; padding: 16px; border-radius: 8px;
+        background-color: var(--header-bg); box-shadow: var(--shadow-md);
+        width: 350px; max-width: 90vw; border-left: 4px solid;
+        animation: slideIn 0.3s ease-out, fadeOut 0.5s ease-in 4.5s forwards;
+    }
+    .toast.success { border-left-color: var(--success-color); }
+    .toast.error { border-left-color: var(--danger-color); }
     .toast-icon { font-size: 1.25rem; margin-right: 12px; }
-    .toast.success .toast-icon { color: var(--success-color); } .toast.error .toast-icon { color: var(--danger-color); }
+    .toast.success .toast-icon { color: var(--success-color); }
+    .toast.error .toast-icon { color: var(--danger-color); }
     .toast-content { flex-grow: 1; }
     .toast-title { font-weight: 600; color: var(--text-primary); margin: 0 0 4px; }
     .toast-message { font-size: 0.9rem; color: var(--text-secondary); margin: 0; }
@@ -61,22 +127,14 @@
     @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; transform: translateX(20px); } }
 </style>
 
-
-<!-- ======================================================= -->
-<!--                  SCRIPT LOADING AREA                    -->
-<!-- ======================================================= -->
-
-<!-- VENDOR SCRIPTS (Libraries are loaded FIRST) -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/js/bootstrap.min.js" integrity="sha512-nKXmKvJyiGQy343jatQlzDprflyB5c+tKCzGP3Uq67v+lmzfnZUi/ZT+fc6ITZfSC5HhaBKUIvr/nTLCV+7F+Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<!-- GLOBAL UI SCRIPT (Loaded SECOND) -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // Define the global UI object
     window.HalkhataUI = {
         showLoader: function() {
             document.getElementById('global-loading-overlay')?.classList.add('show');
@@ -101,18 +159,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Process server-side toasts passed from PHP
     <?php
         $all_toasts = [];
-        if (!empty($_SESSION['toast_errors'])) { $all_toasts = array_merge($all_toasts, array_map(fn($m) => ['type' => 'error', 'title' => 'Error', 'message' => $m], $_SESSION['toast_errors'])); unset($_SESSION['toast_errors']); }
-        if (!empty($_SESSION['toast_success'])) { $all_toasts = array_merge($all_toasts, array_map(fn($m) => ['type' => 'success', 'title' => 'Success', 'message' => $m], $_SESSION['toast_success'])); unset($_SESSION['toast_success']); }
-        if (!empty($all_toasts)) { echo "const serverToasts = " . json_encode($all_toasts) . "; serverToasts.forEach(t => HalkhataUI.showToast(t.title, t.message, t.type));"; }
+        if (!empty($_SESSION['toast_errors'])) {
+            $all_toasts = array_merge($all_toasts, array_map(fn($m) => ['type' => 'error', 'title' => 'Error', 'message' => $m], $_SESSION['toast_errors']));
+            unset($_SESSION['toast_errors']);
+        }
+        if (!empty($_SESSION['toast_success'])) {
+            $all_toasts = array_merge($all_toasts, array_map(fn($m) => ['type' => 'success', 'title' => 'Success', 'message' => $m], $_SESSION['toast_success']));
+            unset($_SESSION['toast_success']);
+        }
+        if (!empty($all_toasts)) {
+            echo "const serverToasts = " . json_encode($all_toasts) . "; serverToasts.forEach(t => HalkhataUI.showToast(t.title, t.message, t.type));";
+        }
     ?>
 
-    // Automatically hide the loader on every page load
     setTimeout(() => { window.HalkhataUI?.hideLoader(); }, 100);
 
-    // Global handler for disabling buttons on form submit
     document.querySelectorAll('form').forEach(form => {
         form.addEventListener('submit', function() {
             const submitButton = form.querySelector('.disable-on-click');
@@ -122,13 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-<!-- PAGE-SPECIFIC SCRIPT STACK (Loaded LAST) -->
-<?php
-// This will render scripts defined in files like history.php and admin.php
-if (isset($page_scripts)) {
-    echo $page_scripts;
-}
-?>
+<?php if (isset($page_scripts)) { echo $page_scripts; } ?>
 
 </body>
 </html>

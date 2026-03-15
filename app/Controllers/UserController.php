@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../Lib/Mailer.php';
 require_once __DIR__ . '/../Lib/Security.php';
+require_once __DIR__ . '/../Lib/EmailTemplate.php';
 
 class UserController {
     private User $userModel;
@@ -65,14 +66,22 @@ class UserController {
         $verifyUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']==='on' ? 'https' : 'http')
                    . '://'.$_SERVER['HTTP_HOST'].'/verify?token='.$verificationToken;
 
-        $html = "<p>Hi ".htmlspecialchars($name).",</p>
-                 <p>Welcome to Halkhata. Please verify your email:</p>
-                 <p><a href=\"{$verifyUrl}\">Verify Account</a></p>
-                 <p>After verification, admin will approve your account.</p>";
+        $verifyBtn = "<div style='text-align:center;margin:24px 0;'><a href='{$verifyUrl}' style='background-color:#C9A227;color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:700;font-size:16px;display:inline-block;'>Verify My Email</a></div>";
+        $html = EmailTemplate::generate(
+            'Verify Your Logbook Account',
+            $name,
+            'Welcome to Logbook! Please verify your email address to activate your account.',
+            $verifyBtn . 'After verification, an admin will review and approve your account before you can log in.',
+            [
+                'Name' => htmlspecialchars($name),
+                'Email' => htmlspecialchars($email),
+                'Link Valid' => 'Single use only'
+            ]
+        );
 
         $mailer = new Mailer();
-        $mailer->send($email,$name,'Verify your Halkhata account',$html);
-        $this->userModel->logEmail(null,$email,'Verify your Halkhata account');
+        $mailer->send($email,$name,'Verify Your Logbook Account',$html);
+        $this->userModel->logEmail(null,$email,'Verify Your Logbook Account');
 
         $_SESSION['flash_success'] = 'Registration successful. Check your email for verification link.';
         header('Location:/login');
@@ -121,7 +130,6 @@ class UserController {
             $_SESSION['flash_error'] = 'Email already verified. Please login.';
             header('Location:/login'); return;
         }
-        // Rate limiting
         if (!$this->userModel->updateResendVerificationStats($user->id)){
             $_SESSION['flash_error'] = 'Rate limit exceeded. Try again later.';
             header('Location:/login'); return;
@@ -140,13 +148,21 @@ class UserController {
         $verifyUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']==='on' ? 'https' : 'http')
                    . '://'.$_SERVER['HTTP_HOST'].'/verify?token='.$newToken;
 
-        $html = "<p>Hello ".htmlspecialchars($user->name).",</p>
-                 <p>Here is your updated verification link:</p>
-                 <p><a href='{$verifyUrl}'>Verify Email</a></p>";
+        $verifyBtn = "<div style='text-align:center;margin:24px 0;'><a href='{$verifyUrl}' style='background-color:#C9A227;color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:700;font-size:16px;display:inline-block;'>Verify My Email</a></div>";
+        $html = EmailTemplate::generate(
+            'Email Verification Link',
+            $user->name,
+            'You requested a new verification link for your Logbook account.',
+            $verifyBtn . 'If you did not request this, please ignore this email.',
+            [
+                'Email' => htmlspecialchars($user->email),
+                'Link Valid' => 'Single use only'
+            ]
+        );
 
         $mailer = new Mailer();
-        $mailer->send($user->email,$user->name,'Resend Email Verification',$html);
-        $this->userModel->logEmail($user->id,$user->email,'Resend Email Verification');
+        $mailer->send($user->email,$user->name,'Email Verification Link',$html);
+        $this->userModel->logEmail($user->id,$user->email,'Email Verification Link');
 
         $_SESSION['flash_success'] = 'Verification email resent.';
         header('Location:/login');

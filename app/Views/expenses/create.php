@@ -3,7 +3,6 @@ $title = 'Create Group Expense';
 require_once __DIR__ . '/../layouts/header.php';
 require_once __DIR__ . '/../../Lib/Security.php';
 
-// Prepare user data for JS
 $current_user_id = $_SESSION['user_id'];
 $current_user_name = htmlspecialchars($_SESSION['user_name']);
 ?>
@@ -16,9 +15,7 @@ $current_user_name = htmlspecialchars($_SESSION['user_name']);
 <form id="expense-form" action="/expenses/create" method="post" class="expense-grid">
     <?php echo Security::csrfField(); ?>
 
-    <!-- Main Column: "What" and "How" -->
     <div class="main-column">
-        <!-- Card 1: What was the expense? -->
         <div class="dashboard-card">
             <div class="card-header">
                 <h2><i class="fa-solid fa-receipt"></i> Expense Details</h2>
@@ -39,7 +36,6 @@ $current_user_name = htmlspecialchars($_SESSION['user_name']);
             </div>
         </div>
 
-        <!-- Card 3: How to split? -->
         <div class="dashboard-card">
             <div class="card-header">
                 <h2><i class="fa-solid fa-chart-pie"></i> Split Method</h2>
@@ -51,7 +47,6 @@ $current_user_name = htmlspecialchars($_SESSION['user_name']);
                 </div>
                 <input type="hidden" name="split_mode" id="split_mode_input" value="equal">
             </div>
-            <!-- Custom Shares Section (Appears here when active) -->
             <div id="custom-shares-container" style="display: none;">
                 <div id="custom-shares-list"></div>
                 <div id="shares-summary" class="shares-summary"></div>
@@ -59,36 +54,34 @@ $current_user_name = htmlspecialchars($_SESSION['user_name']);
         </div>
     </div>
 
-    <!-- Sidebar Column: "Who" -->
     <div class="sidebar-column">
         <div class="dashboard-card">
             <div class="card-header">
-                <h2><i class="fa-solid fa-users"></i> Participants & Payer</h2>
+                <h2><i class="fa-solid fa-users"></i> Participants &amp; Payments</h2>
             </div>
-            <p class="subtitle" style="margin-top:-16px; margin-bottom:16px;">Select who was involved and who paid the bill.</p>
+            <p class="subtitle" style="margin-top:-16px; margin-bottom:12px;">Select participants and enter how much each person paid.</p>
+            <div id="payment-summary-bar" class="payment-summary-bar" style="display:none;"></div>
             <div id="participant-payer-list" class="participant-payer-list">
-                <!-- Current User -->
-                <div class="participant-item">
+                <div class="participant-item" data-pid="<?php echo $current_user_id; ?>">
                     <label class="participant-label">
                         <input class="participant-checkbox" type="checkbox" name="participants[]" value="<?php echo $current_user_id; ?>" checked>
                         <?php echo $current_user_name; ?> (You)
                     </label>
-                    <label class="payer-radio">
-                        <input type="radio" name="payer_id" value="<?php echo $current_user_id; ?>" checked>
-                        <span>Paid</span>
-                    </label>
+                    <div class="paid-amount-wrapper">
+                        <span class="paid-label">৳</span>
+                        <input type="number" class="paid-input" name="paid_<?php echo $current_user_id; ?>" value="0" step="0.01" min="0" placeholder="0.00">
+                    </div>
                 </div>
-                <!-- Friends -->
                 <?php foreach ($data['friends'] as $friend) : ?>
-                    <div class="participant-item">
+                    <div class="participant-item" data-pid="<?php echo $friend->id; ?>">
                         <label class="participant-label">
                             <input class="participant-checkbox" type="checkbox" name="participants[]" value="<?php echo $friend->id; ?>">
                             <?php echo htmlspecialchars($friend->name); ?>
                         </label>
-                        <label class="payer-radio">
-                            <input type="radio" name="payer_id" value="<?php echo $friend->id; ?>">
-                            <span>Paid</span>
-                        </label>
+                        <div class="paid-amount-wrapper">
+                            <span class="paid-label">৳</span>
+                            <input type="number" class="paid-input" name="paid_<?php echo $friend->id; ?>" value="0" step="0.01" min="0" placeholder="0.00">
+                        </div>
                     </div>
                 <?php endforeach; ?>
             </div>
@@ -103,20 +96,16 @@ $current_user_name = htmlspecialchars($_SESSION['user_name']);
 </form>
 
 <style>
-    /* Use variables from the global theme */
     .page-header h1 { margin: 0 0 4px 0; color: var(--text-primary); }
     .page-header .subtitle { color: var(--text-secondary); margin: 0 0 24px 0; }
 
-    /* Mobile-First Layout: Single column */
     .expense-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
     .main-column { display: flex; flex-direction: column; gap: 24px; }
 
-    /* Desktop Layout: Two columns */
     @media (min-width: 1024px) {
         .expense-grid { grid-template-columns: 2fr 1fr; }
     }
 
-    /* Consistent Card & Form Styling */
     .dashboard-card { background-color: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 24px; }
     .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--card-border); }
     .card-header h2 { margin: 0; font-size: 1.25rem; color: var(--text-primary); }
@@ -133,27 +122,29 @@ $current_user_name = htmlspecialchars($_SESSION['user_name']);
     .segmented-control { display: flex; width: 100%; background-color: var(--input-bg); border-radius: 8px; padding: 4px; }
     .sg-btn { flex: 1; padding: 10px; border: none; background-color: transparent; border-radius: 6px; font-weight: 500; cursor: pointer; transition: background-color 0.2s, color 0.2s; color: var(--text-secondary); }
     .sg-btn.active { background-color: var(--card-bg); color: var(--brand-color); font-weight: 600; box-shadow: var(--shadow-sm); }
-    
-    /* Interactive Participant/Payer List */
+
     .participant-payer-list { display: flex; flex-direction: column; gap: 8px; }
     .participant-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-radius: 8px; transition: background-color 0.2s; }
     .participant-item:hover { background-color: var(--input-bg); }
     .participant-label { flex-grow: 1; display: flex; align-items: center; gap: 12px; cursor: pointer; color: var(--text-primary); }
     .participant-checkbox { width: 1.2em; height: 1.2em; }
 
-    /* Custom Radio Button for Payer */
-    .payer-radio { position: relative; cursor: pointer; }
-    .payer-radio input { position: absolute; opacity: 0; }
-    .payer-radio span {
-        padding: 6px 12px; border: 1px solid var(--card-border); border-radius: 16px;
-        font-size: 0.8rem; font-weight: 500; color: var(--text-secondary);
-        transition: all 0.2s;
+    .paid-amount-wrapper { display: flex; align-items: center; gap: 4px; }
+    .paid-label { color: var(--text-secondary); font-size: 0.9rem; }
+    .paid-input {
+        width: 90px; padding: 6px 8px; border: 1px solid var(--card-border); border-radius: 8px;
+        font-size: 0.9rem; background-color: var(--input-bg); color: var(--text-primary); text-align: right;
     }
-    .payer-radio input:checked + span {
-        background-color: var(--brand-color); color: white; border-color: var(--brand-color); font-weight: 600;
-    }
+    .paid-input:focus { outline: none; border-color: var(--brand-color); box-shadow: 0 0 0 2px var(--brand-color-light); }
 
-    /* Custom Shares Styling */
+    .payment-summary-bar {
+        margin-bottom: 12px; padding: 10px 14px; border-radius: 8px; font-size: 0.875rem; font-weight: 600;
+        transition: all 0.3s; border: 1px solid transparent;
+    }
+    .payment-summary-bar.valid { background-color: var(--success-bg); color: var(--success-text); border-color: var(--success-color); }
+    .payment-summary-bar.invalid { background-color: var(--danger-bg); color: var(--danger-text); border-color: var(--danger-color); }
+    .payment-summary-bar.partial { background-color: var(--warning-bg); color: var(--warning-text); border-color: var(--warning-color); }
+
     #custom-shares-container { margin-top: 24px; border-top: 1px solid var(--card-border); padding-top: 24px; }
     #custom-shares-list { display: flex; flex-direction: column; gap: 16px; }
     .share-item { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 16px; }
@@ -162,7 +153,7 @@ $current_user_name = htmlspecialchars($_SESSION['user_name']);
     .shares-summary.invalid { background-color: var(--danger-bg); color: var(--danger-text); border-color: var(--danger-color); }
     .shares-summary.zero { background-color: var(--input-bg); color: var(--text-secondary); }
 
-    .form-footer { grid-column: 1 / -1; } /* Makes footer span all columns in grid */
+    .form-footer { grid-column: 1 / -1; }
     .btn-primary {
         width: 100%; background-color: var(--brand-color); color: white; padding: 14px; font-size: 1.1rem;
         font-weight: 600; border-radius: 8px; border: none; cursor: pointer;
@@ -175,34 +166,74 @@ $current_user_name = htmlspecialchars($_SESSION['user_name']);
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // --- ELEMENT SELECTORS ---
     const form = document.getElementById('expense-form');
     const totalAmountInput = document.getElementById('total_amount');
-    const participantItems = form.querySelectorAll('.participant-item');
     const customSharesContainer = document.getElementById('custom-shares-container');
     const customSharesList = document.getElementById('custom-shares-list');
     const sharesSummary = document.getElementById('shares-summary');
     const submitButton = document.getElementById('submit-button');
     const splitModeControl = form.querySelector('.segmented-control');
     const splitModeInput = document.getElementById('split_mode_input');
+    const paymentSummaryBar = document.getElementById('payment-summary-bar');
 
-    // --- FUNCTIONS ---
-    function handlePayerChange() {
-        const selectedPayerId = form.querySelector('input[name="payer_id"]:checked').value;
-        participantItems.forEach(item => {
-            const checkbox = item.querySelector('.participant-checkbox');
-            // If this item's user is the payer, check and disable their participant checkbox
-            if (checkbox.value === selectedPayerId) {
-                checkbox.checked = true;
-                checkbox.disabled = true;
-            } else {
-                checkbox.disabled = false;
+    function getCheckedParticipants() {
+        return Array.from(form.querySelectorAll('.participant-checkbox:checked'))
+            .map(cb => ({
+                id: cb.value,
+                name: cb.closest('.participant-label').textContent.trim()
+            }));
+    }
+
+    function validatePayments() {
+        const totalAmount = parseFloat(totalAmountInput.value) || 0;
+        if (totalAmount === 0) {
+            paymentSummaryBar.style.display = 'none';
+            return false;
+        }
+
+        let paidSum = 0;
+        form.querySelectorAll('.paid-input').forEach(inp => {
+            const item = inp.closest('.participant-item');
+            const cb = item.querySelector('.participant-checkbox');
+            if (cb && cb.checked) {
+                paidSum += parseFloat(inp.value) || 0;
             }
         });
-        // If in custom mode, we need to rebuild the shares list
-        if (splitModeInput.value === 'custom') {
-            rebuildCustomSharesList();
+
+        const remaining = totalAmount - paidSum;
+        paymentSummaryBar.style.display = 'block';
+
+        if (Math.abs(remaining) < 0.01) {
+            paymentSummaryBar.textContent = '✅ Payments match total amount!';
+            paymentSummaryBar.className = 'payment-summary-bar valid';
+            return true;
+        } else if (remaining > 0) {
+            paymentSummaryBar.textContent = '৳' + remaining.toFixed(2) + ' still unassigned';
+            paymentSummaryBar.className = 'payment-summary-bar partial';
+            return false;
+        } else {
+            paymentSummaryBar.textContent = '❌ Over by ৳' + Math.abs(remaining).toFixed(2);
+            paymentSummaryBar.className = 'payment-summary-bar invalid';
+            return false;
         }
+    }
+
+    function initPayments() {
+        const totalAmount = parseFloat(totalAmountInput.value) || 0;
+        const checkedItems = form.querySelectorAll('.participant-checkbox:checked');
+        if (checkedItems.length === 0 || totalAmount === 0) return;
+
+        const firstChecked = checkedItems[0];
+        const firstItem = firstChecked.closest('.participant-item');
+        const firstPaidInput = firstItem.querySelector('.paid-input');
+
+        form.querySelectorAll('.participant-item').forEach(item => {
+            const paidInput = item.querySelector('.paid-input');
+            paidInput.value = '0';
+        });
+
+        if (firstPaidInput) firstPaidInput.value = totalAmount.toFixed(2);
+        validatePayments();
     }
 
     function updateView() {
@@ -212,17 +243,21 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isCustomMode) {
             rebuildCustomSharesList();
         } else {
-            submitButton.disabled = false;
+            updateSubmitButton();
+        }
+    }
+
+    function updateSubmitButton() {
+        const paymentsOk = validatePayments();
+        const isCustomMode = splitModeInput.value === 'custom';
+        if (!isCustomMode) {
+            submitButton.disabled = !paymentsOk;
         }
     }
 
     function rebuildCustomSharesList() {
         customSharesList.innerHTML = '';
-        const selectedParticipants = Array.from(form.querySelectorAll('.participant-checkbox:checked'))
-            .map(cb => ({
-                id: cb.value,
-                name: cb.closest('.participant-label').textContent.trim()
-            }));
+        const selectedParticipants = getCheckedParticipants();
 
         selectedParticipants.forEach(p => {
             const row = document.createElement('div');
@@ -235,9 +270,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>`;
             customSharesList.appendChild(row);
         });
-        
+
         customSharesList.querySelectorAll('.share-input').forEach(input => input.addEventListener('input', validateShares));
-        validateShares(); // Initial validation
+        validateShares();
     }
 
     function validateShares() {
@@ -245,6 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let sharesTotal = 0;
         customSharesList.querySelectorAll('.share-input').forEach(input => { sharesTotal += parseFloat(input.value) || 0; });
         const remaining = totalAmount - sharesTotal;
+        const paymentsOk = validatePayments();
 
         sharesSummary.classList.remove('valid', 'invalid', 'zero');
 
@@ -258,7 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (Math.abs(remaining) < 0.001) {
             sharesSummary.textContent = '✅ Shares match the total amount!';
             sharesSummary.classList.add('valid');
-            submitButton.disabled = false;
+            submitButton.disabled = !paymentsOk;
         } else if (remaining < 0) {
             sharesSummary.textContent = `❌ Over by ৳${Math.abs(remaining).toFixed(2)}`;
             sharesSummary.classList.add('invalid');
@@ -270,7 +306,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- EVENT LISTENERS ---
     splitModeControl.querySelectorAll('.sg-btn').forEach(button => {
         button.addEventListener('click', () => {
             splitModeControl.querySelector('.active').classList.remove('active');
@@ -281,17 +316,31 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     form.querySelectorAll('.participant-checkbox').forEach(cb => {
-        cb.addEventListener('change', () => { if (splitModeInput.value === 'custom') rebuildCustomSharesList(); });
+        cb.addEventListener('change', () => {
+            if (splitModeInput.value === 'custom') rebuildCustomSharesList();
+            validatePayments();
+            updateSubmitButton();
+        });
     });
 
-    form.querySelectorAll('input[name="payer_id"]').forEach(radio => {
-        radio.addEventListener('change', handlePayerChange);
+    form.querySelectorAll('.paid-input').forEach(inp => {
+        inp.addEventListener('input', () => {
+            validatePayments();
+            updateSubmitButton();
+            if (splitModeInput.value === 'custom') validateShares();
+        });
     });
 
-    totalAmountInput.addEventListener('input', () => { if (splitModeInput.value === 'custom') validateShares(); });
+    totalAmountInput.addEventListener('input', () => {
+        initPayments();
+        if (splitModeInput.value === 'custom') {
+            rebuildCustomSharesList();
+        } else {
+            updateSubmitButton();
+        }
+    });
 
-    // --- INITIALIZATION ---
-    handlePayerChange(); // Run once on load to set the initial state
+    initPayments();
     updateView();
 });
 </script>

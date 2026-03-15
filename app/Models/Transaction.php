@@ -3,7 +3,7 @@ class Transaction {
     private $db;
     public function __construct(){ $this->db = new Database(); }
 
-    public function createTransaction($lenderId,$borrowerId,$amount,$description,$expenseId=null,$createdBy=0){
+    public function createTransaction($lenderId,$borrowerId,$amount,$description,$expenseId=null,$createdBy=0): int|false {
         $this->db->query("INSERT INTO transactions (created_by,lender_id,borrower_id,amount,description,expense_id) VALUES (:cb,:l,:b,:amt,:d,:eid)");
         $this->db->bind(':cb',$createdBy);
         $this->db->bind(':l',$lenderId);
@@ -11,7 +11,11 @@ class Transaction {
         $this->db->bind(':amt',$amount);
         $this->db->bind(':d',$description);
         $this->db->bind(':eid',$expenseId);
-        return $this->db->execute();
+        if ($this->db->execute()) {
+            $id = (int)$this->db->lastInsertId();
+            return $id > 0 ? $id : false;
+        }
+        return false;
     }
 
     public function markTransactionAsPaid($txnId,$actorId){

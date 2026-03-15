@@ -12,12 +12,10 @@ function url($tab, $params = []) {
 $activeTab = $data['tab'] ?? 'dashboard';
 ?>
 
-<!-- 1. Page Header & Navigation -->
 <div class="page-header">
     <h1><i class="fa-solid fa-shield-halved"></i> Administration</h1>
 </div>
 
-<!-- Main Navigation Tabs -->
 <div class="admin-tabs">
     <a href="<?php echo url('dashboard'); ?>" class="tab-link <?php echo $activeTab === 'dashboard' ? 'active' : ''; ?>">
         <i class="fa-solid fa-chart-line"></i> Dashboard
@@ -28,15 +26,15 @@ $activeTab = $data['tab'] ?? 'dashboard';
     <a href="<?php echo url('logs'); ?>" class="tab-link <?php echo $activeTab === 'logs' ? 'active' : ''; ?>">
         <i class="fa-solid fa-list-check"></i> Audit Logs
     </a>
+    <a href="<?php echo url('settings'); ?>" class="tab-link <?php echo $activeTab === 'settings' ? 'active' : ''; ?>">
+        <i class="fa-solid fa-sliders"></i> Settings
+    </a>
 </div>
 
-<!-- 2. CONTENT SWITCHER -->
 <div class="admin-content">
 
     <?php if ($activeTab === 'dashboard'): ?>
-        <!-- ================= DASHBOARD TAB ================= -->
         <div class="dashboard-grid">
-            <!-- Stats Row -->
             <div class="stats-overview">
                 <div class="stat-card">
                     <div class="stat-icon bg-blue"><i class="fa-solid fa-money-bill-transfer"></i></div>
@@ -61,7 +59,6 @@ $activeTab = $data['tab'] ?? 'dashboard';
                 </div>
             </div>
 
-            <!-- Pending Approvals -->
             <div class="dashboard-card full-width">
                 <div class="card-header">
                     <h2><i class="fa-solid fa-user-clock"></i> Pending User Approvals</h2>
@@ -120,7 +117,6 @@ $activeTab = $data['tab'] ?? 'dashboard';
                 </div>
             </div>
 
-            <!-- Analytics Chart -->
             <div class="dashboard-card full-width">
                 <h3><i class="fa-solid fa-chart-area"></i> 30-Day Activity</h3>
                 <canvas id="txCountChart" height="80"></canvas>
@@ -128,9 +124,7 @@ $activeTab = $data['tab'] ?? 'dashboard';
         </div>
 
     <?php elseif ($activeTab === 'users'): ?>
-        <!-- ================= USERS TAB ================= -->
         <div class="split-grid">
-            <!-- Left: User List -->
             <div class="main-column">
                 <div class="dashboard-card">
                     <div class="card-header">
@@ -173,7 +167,6 @@ $activeTab = $data['tab'] ?? 'dashboard';
                                         </td>
                                         <td data-label="Actions" class="text-right">
                                             <div class="action-buttons justify-end">
-                                                <!-- Impersonate -->
                                                 <?php if ($u->id != $_SESSION['user_id']): ?>
                                                     <form action="/admin/impersonate/<?php echo $u->id; ?>" method="post">
                                                         <?php echo Security::csrfField(); ?>
@@ -181,7 +174,6 @@ $activeTab = $data['tab'] ?? 'dashboard';
                                                     </form>
                                                 <?php endif; ?>
                                                 
-                                                <!-- Ban/Unban -->
                                                 <?php if ($u->banned_at): ?>
                                                     <form action="/admin/unban/<?php echo $u->id; ?>" method="post">
                                                         <?php echo Security::csrfField(); ?>
@@ -194,7 +186,6 @@ $activeTab = $data['tab'] ?? 'dashboard';
                                                     </form>
                                                 <?php endif; ?>
 
-                                                <!-- Role Toggle -->
                                                 <?php if ($u->role === 'user'): ?>
                                                     <form action="/admin/promote/<?php echo $u->id; ?>" method="post" onsubmit="return confirm('Promote to Admin?');">
                                                         <?php echo Security::csrfField(); ?>
@@ -216,7 +207,6 @@ $activeTab = $data['tab'] ?? 'dashboard';
                         </table>
                     </div>
 
-                    <!-- Pagination -->
                     <?php if ($data['totalPages'] > 1): ?>
                         <div class="pagination">
                             <?php for($i=1; $i<=$data['totalPages']; $i++): ?>
@@ -228,7 +218,6 @@ $activeTab = $data['tab'] ?? 'dashboard';
                 </div>
             </div>
 
-            <!-- Right: Filters & Exports -->
             <div class="sidebar-column">
                 <div class="dashboard-card">
                     <h3>Filter Users</h3>
@@ -270,7 +259,6 @@ $activeTab = $data['tab'] ?? 'dashboard';
         </div>
 
     <?php elseif ($activeTab === 'logs'): ?>
-        <!-- ================= LOGS TAB ================= -->
         <div class="dashboard-card full-width">
             <div class="card-header">
                 <h2>System Audit Logs (<?php echo $data['totalActions']; ?>)</h2>
@@ -313,11 +301,78 @@ $activeTab = $data['tab'] ?? 'dashboard';
                 <?php endif; ?>
             </div>
         </div>
+    <?php elseif ($activeTab === 'settings'): ?>
+    <div class="dashboard-card" style="max-width:600px;">
+        <div class="card-header">
+            <h2><i class="fa-solid fa-envelope-open-text"></i> Mail / SMTP Settings</h2>
+        </div>
+        <p style="color:var(--text-secondary);margin-bottom:20px;font-size:0.9rem;">
+            These settings control how Logbook sends email notifications.
+            Leave the password field blank to keep the existing password.
+        </p>
+        <form action="/admin/settings/save" method="post">
+            <?php echo Security::csrfField(); ?>
+            <div class="settings-form">
+                <div class="form-row">
+                    <label>SMTP Host</label>
+                    <input type="text" name="smtp_host" value="<?php echo htmlspecialchars($data['mailConfig']['host']); ?>" required placeholder="mail.example.com">
+                </div>
+                <div class="form-row">
+                    <label>SMTP Port</label>
+                    <input type="number" name="smtp_port" value="<?php echo (int)$data['mailConfig']['port']; ?>" required placeholder="465">
+                </div>
+                <div class="form-row">
+                    <label>Encryption</label>
+                    <select name="smtp_secure">
+                        <option value="ssl" <?php echo ($data['mailConfig']['secure'] === 'ssl') ? 'selected' : ''; ?>>SSL (Port 465)</option>
+                        <option value="tls" <?php echo ($data['mailConfig']['secure'] === 'tls') ? 'selected' : ''; ?>>TLS (Port 587)</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>SMTP Username</label>
+                    <input type="email" name="smtp_user" value="<?php echo htmlspecialchars($data['mailConfig']['user']); ?>" required placeholder="user@example.com">
+                </div>
+                <div class="form-row">
+                    <label>SMTP Password</label>
+                    <input type="password" name="smtp_pass" placeholder="Leave blank to keep existing password" autocomplete="new-password">
+                </div>
+                <div class="form-row">
+                    <label>From Email</label>
+                    <input type="email" name="smtp_from_email" value="<?php echo htmlspecialchars($data['mailConfig']['from_email']); ?>" required placeholder="noreply@example.com">
+                </div>
+                <div class="form-row">
+                    <label>From Name</label>
+                    <input type="text" name="smtp_from_name" value="<?php echo htmlspecialchars($data['mailConfig']['from_name']); ?>" placeholder="LogBook">
+                </div>
+                <div class="form-row">
+                    <button type="submit" class="btn btn-primary disable-on-click">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Settings
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <style>
+        .settings-form { display: flex; flex-direction: column; gap: 16px; }
+        .form-row { display: grid; grid-template-columns: 160px 1fr; align-items: center; gap: 16px; }
+        .form-row label { font-weight: 500; color: var(--text-secondary); font-size: 0.9rem; }
+        .form-row input, .form-row select {
+            padding: 10px 14px; border: 1px solid var(--card-border);
+            border-radius: 8px; background: var(--input-bg); color: var(--text-primary);
+            font-size: 0.95rem; width: 100%;
+        }
+        .form-row input:focus, .form-row select:focus {
+            outline: none; border-color: var(--brand-color);
+            box-shadow: 0 0 0 3px rgba(201,162,39,0.15);
+        }
+        @media (max-width: 600px) {
+            .form-row { grid-template-columns: 1fr; gap: 6px; }
+        }
+    </style>
     <?php endif; ?>
 
 </div>
 
-<!-- 3. STYLES -->
 <style>
     /* Tabs */
     .admin-tabs { display: flex; gap: 10px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 4px; border-bottom: 1px solid var(--card-border); }
@@ -380,7 +435,6 @@ $activeTab = $data['tab'] ?? 'dashboard';
     .count-badge { background: var(--brand-color); color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; }
 </style>
 
-<!-- 4. SCRIPTS (Chart.js for Dashboard) -->
 <?php if ($activeTab === 'dashboard'): ?>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
