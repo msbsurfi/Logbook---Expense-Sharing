@@ -91,19 +91,15 @@ class AdminController {
     private function collectStats(){
         $db = new Database();
         
-        // Total Transactions & Sum
         $db->query("SELECT COUNT(*) AS total_tx, SUM(amount) AS sum_amt FROM transactions");
         $all = $db->fetchOne();
 
-        // Weekly Stats
         $db->query("SELECT COUNT(*) AS weekly_tx, SUM(amount) AS weekly_sum FROM transactions WHERE created_at >= (NOW() - INTERVAL 7 DAY)");
         $wk = $db->fetchOne();
 
-        // Monthly Stats
         $db->query("SELECT COUNT(*) AS monthly_tx, SUM(amount) AS monthly_sum FROM transactions WHERE created_at >= (NOW() - INTERVAL 30 DAY)");
         $mo = $db->fetchOne();
 
-        // Email Stats
         $db->query("SELECT COUNT(*) AS weekly_emails FROM email_log WHERE sent_at >= (NOW() - INTERVAL 7 DAY)");
         $we = $db->fetchOne();
         $db->query("SELECT COUNT(*) AS monthly_emails FROM email_log WHERE sent_at >= (NOW() - INTERVAL 30 DAY)");
@@ -347,17 +343,29 @@ class AdminController {
     public function saveSettings(){
         $this->checkCsrf();
         $host      = trim($_POST['smtp_host'] ?? '');
-        $user      = trim($_POST['smtp_user'] ?? '');
+        $user      = filter_var(trim($_POST['smtp_user'] ?? ''), FILTER_VALIDATE_EMAIL);
         $pass      = $_POST['smtp_pass'] ?? '';
         $port      = (int)($_POST['smtp_port'] ?? 465);
         $fromEmail = filter_var(trim($_POST['smtp_from_email'] ?? ''), FILTER_VALIDATE_EMAIL);
-        $fromName  = trim($_POST['smtp_from_name'] ?? 'Logbook');
+        $fromName  = preg_replace('/[^a-zA-Z0-9 _\-]/', '', trim($_POST['smtp_from_name'] ?? 'Logbook'));
         $secure    = in_array($_POST['smtp_secure'] ?? 'ssl', ['ssl', 'tls']) ? $_POST['smtp_secure'] : 'ssl';
 
+        if (!preg_match('/^[a-zA-Z0-9.\-]+$/', $host)) {
+            $_SESSION['flash_error'] = 'SMTP host must be a valid hostname (letters, digits, dots, hyphens only).';
+            header('Location:/admin?tab=settings');
+            exit();
+        }
+
+        if ($port < 1 || $port > 65535) {
+            $_SESSION['flash_error'] = 'SMTP port must be between 1 and 65535.';
+            header('Location:/admin?tab=settings');
+            exit();
+        }
+
         if (!$host || !$user || !$fromEmail){
-            $_SESSION['flash_error'] = 'Host, username, and a valid from-email are required.';
-            $this->redirectBack();
-            return;
+            $_SESSION['flash_error'] = 'Host, a valid SMTP username email, and a valid from-email are required.';
+            header('Location:/admin?tab=settings');
+            exit();
         }
 
         if (empty($pass)){

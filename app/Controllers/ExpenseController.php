@@ -125,7 +125,7 @@ class ExpenseController {
 
         $createdTxnIds = [];
         foreach ($minimizedTxns as $txn) {
-            $created = $this->transactionModel->createTransaction(
+            $newId = $this->transactionModel->createTransaction(
                 $txn['lender'],
                 $txn['borrower'],
                 round($txn['amount'], 2),
@@ -133,10 +133,8 @@ class ExpenseController {
                 $eid,
                 $creatorId
             );
-            if ($created) {
-                $db->query("SELECT LAST_INSERT_ID() AS id");
-                $row = $db->fetchOne();
-                if ($row) $createdTxnIds[] = (int)$row->id;
+            if ($newId !== false) {
+                $createdTxnIds[] = $newId;
             }
         }
 
@@ -147,11 +145,12 @@ class ExpenseController {
     }
 
     private function minimizeDebts(array $netBalances): array {
+        $eps = 0.01;
         $positive = [];
         $negative = [];
         foreach ($netBalances as $userId => $balance) {
-            if ($balance > 0.005) $positive[(int)$userId] = $balance;
-            elseif ($balance < -0.005) $negative[(int)$userId] = abs($balance);
+            if ($balance > $eps) $positive[(int)$userId] = $balance;
+            elseif ($balance < -$eps) $negative[(int)$userId] = abs($balance);
         }
 
         $transactions = [];
@@ -171,8 +170,8 @@ class ExpenseController {
             $positive[$creditorId] -= $amount;
             $negative[$debtorId]   -= $amount;
 
-            if ($positive[$creditorId] < 0.005) unset($positive[$creditorId]);
-            if ($negative[$debtorId] < 0.005)   unset($negative[$debtorId]);
+            if ($positive[$creditorId] < $eps) unset($positive[$creditorId]);
+            if ($negative[$debtorId] < $eps)   unset($negative[$debtorId]);
         }
         return $transactions;
     }
@@ -188,12 +187,9 @@ class ExpenseController {
             if ($u) $userObjects[$pid] = $u;
         }
 
-        $db = new Database();
         $fullTxns = [];
         foreach ($txnIds as $tid) {
-            $db->query("SELECT * FROM transactions WHERE id=:id");
-            $db->bind(':id', $tid);
-            $t = $db->fetchOne();
+            $t = $this->transactionModel->getTransactionById($tid);
             if ($t) $fullTxns[] = $t;
         }
 

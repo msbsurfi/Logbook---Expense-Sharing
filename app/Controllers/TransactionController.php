@@ -54,13 +54,14 @@ class TransactionController {
                     $isLender = ($userObject->id === $lenderId);
                     $otherPartyName = $isLender ? $borrower->name : $lender->name;
 
+                    $safeName = htmlspecialchars($otherPartyName);
                     if ($isLender) {
-                        $mainMessage = "<strong>You lent</strong> money to <strong>{$otherPartyName}</strong>.";
+                        $mainMessage = "<strong>You lent</strong> money to <strong>{$safeName}</strong>.";
                         $subMessage = "You are currently owed this amount.";
                         $color = "#28a745";
                     } else {
-                        $mainMessage = "<strong>You borrowed</strong> money from <strong>{$otherPartyName}</strong>.";
-                        $subMessage = "You owe this amount to {$otherPartyName}.";
+                        $mainMessage = "<strong>You borrowed</strong> money from <strong>{$safeName}</strong>.";
+                        $subMessage = "You owe this amount to {$safeName}.";
                         $color = "#dc3545";
                     }
 
@@ -68,8 +69,8 @@ class TransactionController {
                         'Description' => htmlspecialchars($description),
                         'Amount' => '৳' . number_format($amount, 2),
                         'Role' => $isLender ? 'Lender (You)' : 'Borrower (You)',
-                        'Other Party' => $otherPartyName,
-                        'Recorded By' => $creator->name,
+                        'Other Party' => $safeName,
+                        'Recorded By' => htmlspecialchars($creator->name),
                         'Time' => $formattedTime . ' (GMT+6)'
                     ];
 
@@ -152,14 +153,14 @@ class TransactionController {
                 foreach([$lender, $borrower] as $userObject){
                     if ($userObject && property_exists($userObject, 'email') && !empty($userObject->email)) {
                         $isLender = ($userObject->id === $lender->id);
-                        $otherPartyName = $isLender ? $borrower->name : $lender->name;
+                        $safeName = htmlspecialchars($isLender ? $borrower->name : $lender->name);
 
                         if ($isLender) {
-                            $mainMessage = "Payment received from <strong>{$otherPartyName}</strong>.";
+                            $mainMessage = "Payment received from <strong>{$safeName}</strong>.";
                             $subMessage = "This debt has been marked as settled.";
                             $color = "#28a745";
                         } else {
-                            $mainMessage = "You paid <strong>{$otherPartyName}</strong>.";
+                            $mainMessage = "You paid <strong>{$safeName}</strong>.";
                             $subMessage = "You have settled this debt.";
                             $color = "#007bff";
                         }
@@ -168,7 +169,7 @@ class TransactionController {
                             'Transaction ID' => '#' . $tid,
                             'Original Description' => htmlspecialchars($txn->description),
                             'Amount Settled' => '৳' . number_format($txn->amount, 2),
-                            'Settled By' => $settler->name,
+                            'Settled By' => htmlspecialchars($settler->name),
                             'Settled At' => $formattedTime . ' (GMT+6)'
                         ];
 
