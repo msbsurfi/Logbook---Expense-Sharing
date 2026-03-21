@@ -1,13 +1,22 @@
+<?php
+require_once __DIR__ . '/../Lib/Security.php';
+$logoVersion = (string) (
+  @filemtime(__DIR__ . '/../../public/logo.png')
+  ?: time()
+);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/x-icon" href="/logo.png">
-  <title>Login - LogBook</title>
+  <meta name="theme-color" content="#b8860b">
+  <link rel="icon" type="image/png" href="/favicon.png?v=<?php echo rawurlencode($logoVersion); ?>">
+  <link rel="shortcut icon" href="/favicon.png?v=<?php echo rawurlencode($logoVersion); ?>">
+  <link rel="apple-touch-icon" href="/logo.png?v=<?php echo rawurlencode($logoVersion); ?>">
+  <title>Login - Logbook</title>
   
-  <!-- Font Awesome for icons (This is the only external link, as embedding an icon library is impractical) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer">
 
   <style>
     /* --- CSS STYLES --- */
@@ -56,9 +65,30 @@
       text-align: center;
     }
 
-    .logo {
-      max-width: 150px;
+    .brand-lockup {
+      display: grid;
+      justify-items: center;
+      gap: 10px;
       margin-bottom: 20px;
+    }
+
+    .auth-logo {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+      border-radius: 20px;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(184, 134, 11, 0.18);
+      box-shadow: 0 18px 28px rgba(184, 134, 11, 0.16);
+    }
+
+    .brand-name {
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--subtext-color);
     }
 
     h1 {
@@ -243,12 +273,14 @@
 
 <div class="login-container">
   <div class="login-card">
-    <img src="/logo.png" style="height: 40px;">
+    <div class="brand-lockup">
+      <img src="/logo.png?v=<?php echo rawurlencode($logoVersion); ?>" class="auth-logo" alt="Logbook logo" width="72" height="72">
+      <span class="brand-name">Logbook</span>
+    </div>
     
     <h1>Welcome Back</h1>
-    <p class="subtitle">Sign in to continue to LogBook.</p>
+    <p class="subtitle">Sign in to continue to Logbook.</p>
 
-    <?php require_once __DIR__ . '/../Lib/Security.php'; ?>
     <?php if (!empty($_SESSION['flash_error'])): ?>
       <div class="alert error-box">
         <i class="fa-solid fa-circle-exclamation"></i>
@@ -267,12 +299,12 @@
       
       <div class="form-group">
         <i class="fa-solid fa-envelope input-icon"></i>
-        <input type="email" name="email" placeholder="Email Address" required>
+        <input type="email" name="email" placeholder="Email Address" autocomplete="email" required>
       </div>
 
       <div class="form-group">
         <i class="fa-solid fa-lock input-icon"></i>
-        <input type="password" name="password" id="password" placeholder="Password" required>
+        <input type="password" name="password" id="password" placeholder="Password" autocomplete="current-password" required>
         <i class="fa-solid fa-eye-slash toggle-password" id="togglePassword"></i>
       </div>
 
@@ -300,7 +332,7 @@
       <?php echo Security::csrfField(); ?>
       <div class="form-group">
         <i class="fa-solid fa-envelope input-icon"></i>
-        <input type="email" name="email" placeholder="Email Address" required>
+        <input type="email" name="email" placeholder="Email Address" autocomplete="email" required>
       </div>
       <button type="submit" class="btn disable-on-click">Send Verification Link</button>
     </form>

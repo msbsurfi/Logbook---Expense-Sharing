@@ -1,10 +1,19 @@
-<?php require_once __DIR__ . '/../Lib/Security.php'; ?>
+<?php
+require_once __DIR__ . '/../Lib/Security.php';
+$logoVersion = (string) (
+  @filemtime(__DIR__ . '/../../public/logo.png')
+  ?: time()
+);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/png" href="/logo.png">
+  <meta name="theme-color" content="#b8860b">
+  <link rel="icon" type="image/png" href="/favicon.png?v=<?php echo rawurlencode($logoVersion); ?>">
+  <link rel="shortcut icon" href="/favicon.png?v=<?php echo rawurlencode($logoVersion); ?>">
+  <link rel="apple-touch-icon" href="/logo.png?v=<?php echo rawurlencode($logoVersion); ?>">
   <title>Reset Password - Logbook</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer">
   <style>
@@ -47,17 +56,30 @@
       box-shadow: var(--shadow);
     }
 
-    .logo {
-      display: inline-grid;
-      place-items: center;
-      width: 52px;
-      height: 52px;
-      border-radius: 16px;
-      background: linear-gradient(135deg, var(--brand), #d2a53c);
-      color: #fff;
-      font-size: 1.2rem;
-      font-weight: 800;
+    .brand-lockup {
+      display: grid;
+      justify-items: center;
+      gap: 10px;
       margin-bottom: 20px;
+    }
+
+    .auth-logo {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+      border-radius: 20px;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(184, 134, 11, 0.18);
+      box-shadow: 0 18px 28px rgba(184, 134, 11, 0.16);
+    }
+
+    .brand-name {
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
     }
 
     h1 { margin: 0 0 10px; font-size: 2rem; }
@@ -139,7 +161,10 @@
 <body>
   <div class="auth-shell">
     <div class="auth-card">
-      <div class="logo">L</div>
+      <div class="brand-lockup">
+        <img src="/logo.png?v=<?php echo rawurlencode($logoVersion); ?>" class="auth-logo" alt="Logbook logo" width="72" height="72">
+        <span class="brand-name">Logbook</span>
+      </div>
       <h1>Create a new password</h1>
       <p class="subtitle">Set a new password for <?php echo htmlspecialchars($data['name'] ?? 'your account'); ?>.</p>
 

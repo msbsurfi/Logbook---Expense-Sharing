@@ -1,5 +1,7 @@
 <?php
-session_start();
+require_once __DIR__ . '/../app/Lib/Security.php';
+Security::bootstrap();
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 require_once __DIR__ . '/../app/Models/Database.php';
@@ -9,7 +11,6 @@ require_once __DIR__ . '/../app/Models/Transaction.php';
 require_once __DIR__ . '/../app/Models/Expense.php';
 require_once __DIR__ . '/../app/Models/Notification.php';
 
-require_once __DIR__ . '/../app/Lib/Security.php';
 require_once __DIR__ . '/../app/Lib/Logger.php';
 
 require_once __DIR__ . '/../app/Controllers/UserController.php';
@@ -54,6 +55,10 @@ switch($parts[0]){
         break;
         
     case 'logout':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location:' . (!empty($_SESSION['user_id']) ? '/dashboard' : '/login'));
+            exit();
+        }
         (new UserController())->logout();
         break;
         

@@ -4,6 +4,10 @@ $scriptVersion = (string) (
     ?: @filemtime(__DIR__ . '/../../../public/css/style.v3.css')
     ?: time()
 );
+$logoVersion = (string) (
+    @filemtime(__DIR__ . '/../../../public/logo.png')
+    ?: $scriptVersion
+);
 
 $serverToasts = [];
 $flashMap = [
@@ -60,9 +64,12 @@ foreach ($toastMap as $sessionKey => [$type, $title]) {
 
 <footer class="site-footer">
     <div class="container footer-inner">
-        <div>
-            <strong>Logbook</strong>
-            <p>Clear balances, shared expenses, and faster settlements for small groups.</p>
+        <div class="footer-brand">
+            <img src="/logo.png?v=<?php echo rawurlencode($logoVersion); ?>" alt="Logbook logo" class="footer-logo" width="52" height="52">
+            <div class="footer-copy">
+                <strong>Logbook</strong>
+                <p>Clear balances, shared expenses, and faster settlements for small groups.</p>
+            </div>
         </div>
         <div class="footer-links">
             <a href="mailto:info@logbook.msbsu.com">Support</a>

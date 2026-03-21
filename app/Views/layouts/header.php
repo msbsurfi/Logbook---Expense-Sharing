@@ -16,6 +16,10 @@ $assetVersion = (string) (
     ?: @filemtime(__DIR__ . '/../../../public/js/ui.v2.js')
     ?: time()
 );
+$logoVersion = (string) (
+    @filemtime(__DIR__ . '/../../../public/logo.png')
+    ?: $assetVersion
+);
 
 $primaryNav = [
     ['/dashboard', 'Dashboard', 'fa-solid fa-gauge-high'],
@@ -47,7 +51,10 @@ $isActive = static function (string $path) use ($currentPath): bool {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark">
-    <link rel="icon" type="image/png" href="/logo.png">
+    <meta name="theme-color" content="#b8860b">
+    <link rel="icon" type="image/png" href="/favicon.png?v=<?php echo rawurlencode($logoVersion); ?>">
+    <link rel="shortcut icon" href="/favicon.png?v=<?php echo rawurlencode($logoVersion); ?>">
+    <link rel="apple-touch-icon" href="/logo.png?v=<?php echo rawurlencode($logoVersion); ?>">
     <title><?php echo htmlspecialchars($title ?? 'Logbook'); ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer">
     <link rel="stylesheet" href="/css/style.v3.css?v=<?php echo rawurlencode($assetVersion); ?>">
@@ -83,7 +90,9 @@ $isActive = static function (string $path) use ($currentPath): bool {
 <header class="site-header">
     <div class="container header-inner">
         <a href="<?php echo $isAuthenticated ? '/dashboard' : '/login'; ?>" class="brand-link" aria-label="Logbook home">
-            <span class="brand-mark">L</span>
+            <span class="brand-mark" aria-hidden="true">
+                <img src="/logo.png?v=<?php echo rawurlencode($logoVersion); ?>" alt="" width="44" height="44">
+            </span>
             <span class="brand-copy">
                 <strong>Logbook</strong>
                 <small>Shared debt tracking</small>
@@ -135,10 +144,13 @@ $isActive = static function (string $path) use ($currentPath): bool {
                             <i class="fa-solid fa-address-book"></i>
                             <span>Manage Friends</span>
                         </a>
-                        <a href="/logout" class="danger-link">
-                            <i class="fa-solid fa-right-from-bracket"></i>
-                            <span>Sign Out</span>
-                        </a>
+                        <form action="/logout" method="post" class="menu-action-form">
+                            <?php echo Security::csrfField(); ?>
+                            <button type="submit" class="menu-action danger-link">
+                                <i class="fa-solid fa-right-from-bracket"></i>
+                                <span>Sign Out</span>
+                            </button>
+                        </form>
                     </div>
                 </div>
             <?php else: ?>
@@ -211,10 +223,13 @@ $isActive = static function (string $path) use ($currentPath): bool {
             <span>Toggle Theme</span>
         </button>
         <?php if ($isAuthenticated): ?>
-            <a href="/logout" class="btn btn-primary full-width">
-                <i class="fa-solid fa-right-from-bracket"></i>
-                <span>Sign Out</span>
-            </a>
+            <form action="/logout" method="post">
+                <?php echo Security::csrfField(); ?>
+                <button type="submit" class="btn btn-primary full-width">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Sign Out</span>
+                </button>
+            </form>
         <?php endif; ?>
     </div>
 </aside>

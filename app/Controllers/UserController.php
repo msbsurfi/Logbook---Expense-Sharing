@@ -251,8 +251,8 @@ class UserController {
             $_SESSION['flash_error']='Invalid credentials.'; header('Location:/login'); return;
         }
 
-        session_regenerate_id(true);
         $this->setAuthenticatedSession($user);
+        Security::markAuthenticatedSession();
         $_SESSION['flash_success']    = 'Login successful.';
         header('Location:/dashboard');
     }
@@ -356,13 +356,20 @@ class UserController {
     }
 
     public function logout(){
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !Security::validateCsrf($_POST['csrf_token'] ?? '')){
+            header('Location:' . (!empty($_SESSION['user_id']) ? '/dashboard' : '/login'));
+            return;
+        }
+
         $impersonator = $_SESSION['impersonator_admin_id'] ?? null;
         $impersonated = $_SESSION['impersonated_user_id'] ?? null;
-        session_unset();
-        session_destroy();
-        session_start();
+        Security::destroySession();
+        Security::ensureSession();
+
         if ($impersonator && $impersonated){
             $_SESSION['flash_success']='Impersonation session ended.';
+        } else {
+            $_SESSION['flash_success']='Signed out successfully.';
         }
         header('Location:/login');
     }
