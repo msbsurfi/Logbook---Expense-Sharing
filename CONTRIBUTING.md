@@ -23,7 +23,7 @@ All participants are expected to maintain a respectful, professional environment
 
 ## Reporting Bugs
 
-If you discover a bug, please open a [GitHub Issue](https://github.com/msbsurfi/Logbook/issues) and include:
+If you discover a bug, please open an issue in your repository tracker, for example `https://YOURDOMAIN/issues`, and include:
 
 1. A clear, descriptive title.
 2. Steps to reproduce the bug.

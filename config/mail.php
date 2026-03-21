@@ -1,8 +1,8 @@
 <?php
-define('SMTP_HOST', 'mail.logbook.msbsu.com'); // UPDATE
-define('SMTP_USER', 'info@logbook.msbsu.com'); // UPDATE
-define('SMTP_PASS', 'nurshop5300##'); // UPDATE
+define('SMTP_HOST', 'mail.YOURDOMAIN');
+define('SMTP_USER', 'noreply@YOURDOMAIN');
+define('SMTP_PASS', 'YOURDOMAIN');
 define('SMTP_PORT', 465);
-define('SMTP_FROM_EMAIL', 'info@logbook.msbsu.com');
-define('SMTP_FROM_NAME', 'LogBook');
+define('SMTP_FROM_EMAIL', 'noreply@YOURDOMAIN');
+define('SMTP_FROM_NAME', 'Logbook');
 define('SMTP_SECURE', 'ssl');

@@ -1,5 +1,6 @@
 <?php
-define('DB_HOST', 'localhost');
-define('DB_USER', 'msbsurfi_logbook');       // UPDATE
-define('DB_PASS', 'p56!oc3M7');   // UPDATE
-define('DB_NAME', 'msbsurfi_logbook');           // UPDATE
+define('DB_HOST', 'YOURDOMAIN');
+define('DB_PORT', 3306);
+define('DB_USER', 'YOURDOMAIN');
+define('DB_PASS', 'YOURDOMAIN');
+define('DB_NAME', 'YOURDOMAIN');

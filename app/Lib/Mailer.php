@@ -4,12 +4,20 @@ use PHPMailer\PHPMailer\Exception;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 require_once __DIR__ . '/../../config/mail.php';
+require_once __DIR__ . '/Install.php';
 
 class Mailer {
     private PHPMailer $mail;
+    private bool $configured;
 
     public function __construct() {
         $this->mail = new PHPMailer(true);
+        $this->configured = self::isConfigured();
+
+        if (!$this->configured) {
+            return;
+        }
+
         $this->mail->isSMTP();
         $this->mail->Host       = SMTP_HOST;
         $this->mail->SMTPAuth   = true;
@@ -24,7 +32,15 @@ class Mailer {
         $this->mail->CharSet = 'UTF-8';
     }
 
+    public static function isConfigured(): bool {
+        return Install::isMailConfigured();
+    }
+
     public function send(string $toEmail, string $toName, string $subject, string $htmlBody, string $plainText=''): bool {
+        if (!$this->configured) {
+            return false;
+        }
+
         try {
             $this->mail->clearAddresses();
             $this->mail->addAddress($toEmail, $toName);

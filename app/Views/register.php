@@ -359,7 +359,7 @@ $logoVersion = (string) (
         <h3>4. Limitation of Liability</h3>
         <p>In no event shall LogBook, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses...</p>
         
-        <p><em>To delete you account from LogBook, request a deletion by mailing to info@logbook.msbsu.com and to report abuse mail to abuse@logbook.msbsu.com</em></p>
+        <p><em>To delete your account from LogBook, request a deletion by mailing support@YOURDOMAIN and report abuse at abuse@YOURDOMAIN.</em></p>
     </div>
   </div>
 </div>

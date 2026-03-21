@@ -3,6 +3,7 @@ require_once __DIR__ . '/../Lib/Mailer.php';
 require_once __DIR__ . '/../Lib/Security.php';
 require_once __DIR__ . '/../Lib/Logger.php';
 require_once __DIR__ . '/../Lib/EmailTemplate.php';
+require_once __DIR__ . '/../Lib/Install.php';
 
 class AdminController {
     private $userModel;
@@ -87,6 +88,7 @@ class AdminController {
                     'from_name'  => SMTP_FROM_NAME,
                     'secure'     => SMTP_SECURE ?? 'ssl',
                 ];
+                $data['mailConfigured'] = Install::isMailConfigured();
                 break;
         }
     
@@ -400,17 +402,21 @@ class AdminController {
             $pass = SMTP_PASS;
         }
 
-        $configPath = __DIR__ . '/../../config/mail.php';
-        $content = "<?php\n"
-            . "define('SMTP_HOST', " . var_export($host, true) . ");\n"
-            . "define('SMTP_USER', " . var_export($user, true) . ");\n"
-            . "define('SMTP_PASS', " . var_export($pass, true) . ");\n"
-            . "define('SMTP_PORT', " . $port . ");\n"
-            . "define('SMTP_FROM_EMAIL', " . var_export($fromEmail, true) . ");\n"
-            . "define('SMTP_FROM_NAME', " . var_export($fromName, true) . ");\n"
-            . "define('SMTP_SECURE', " . var_export($secure, true) . ");\n";
+        if (Install::isPlaceholderValue($pass)) {
+            $_SESSION['flash_error'] = 'SMTP password is required before mail delivery can be enabled.';
+            header('Location:/admin?tab=settings');
+            exit();
+        }
 
-        if (file_put_contents($configPath, $content) !== false){
+        if (Install::writeMailConfig([
+            'host' => $host,
+            'user' => $user,
+            'pass' => $pass,
+            'port' => $port,
+            'from_email' => $fromEmail,
+            'from_name' => $fromName,
+            'secure' => $secure,
+        ])){
             $this->logger->logAdminAction($_SESSION['user_id'], 'update_mail_settings', [
                 'host' => $host, 'user' => $user, 'port' => $port
             ]);

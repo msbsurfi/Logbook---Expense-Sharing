@@ -92,6 +92,7 @@ The system supports multi-user collaboration with friend networks, real-time not
 - Password reset emails
 - Configurable SMTP settings via `config/mail.php`
 - Background **cron job** for periodic email summaries (`scripts/cron/email_summary.php`)
+- First-run installer at `/install.php` with automatic schema import and admin bootstrap
 
 ---
 
@@ -179,7 +180,7 @@ Logbook/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/msbsurfi/Logbook.git
+git clone https://YOURDOMAIN/repository.git
 cd Logbook
 ```
 
@@ -189,33 +190,13 @@ cd Logbook
 composer install
 ```
 
-### 3. Set Up the Database
-
-Create a new MySQL database and import the schema:
-
-```bash
-mysql -u your_user -p -e "CREATE DATABASE logbook;"
-mysql -u your_user -p logbook < database/schema.sql
-```
-
-### 4. Configure the Application
-
-Copy and edit the configuration files:
-
-```bash
-cp config/database.example.php config/database.php
-cp config/mail.example.php     config/mail.php
-```
-
-Fill in your database credentials in `config/database.php` and your SMTP details in `config/mail.php` (see [Configuration](#configuration)).
-
-### 5. Set the Document Root
+### 3. Set the Document Root
 
 Configure your Apache virtual host or your hosting control panel to point the document root to the `public/` directory:
 
 ```apache
 <VirtualHost *:80>
-    ServerName yourdomain.com
+    ServerName YOURDOMAIN
     DocumentRoot /path/to/Logbook/public
 
     <Directory /path/to/Logbook/public>
@@ -225,14 +206,24 @@ Configure your Apache virtual host or your hosting control panel to point the do
 </VirtualHost>
 ```
 
-### 6. Set File Permissions
+### 4. Run the Installer
+
+Visit `/install.php` in your browser. The installer will:
+
+- collect database credentials
+- optionally collect SMTP credentials or let you skip mail setup for later
+- create the database if needed
+- import `database/install.sql`
+- create the first admin account
+- hand off to `fix.php` to remove the installer script
+
+### 5. Set File Permissions
 
 ```bash
 chmod -R 755 .
-chmod -R 777 storage/   # if a writable storage directory is used
 ```
 
-### 7. (Optional) Set Up the Cron Job
+### 6. (Optional) Set Up the Cron Job
 
 Add the following cron entry to send periodic email summaries:
 
@@ -248,31 +239,27 @@ Add the following cron entry to send periodic email summaries:
 
 ```php
 <?php
-return [
-    'host'     => 'localhost',
-    'dbname'   => 'your_database_name',
-    'username' => 'your_db_user',
-    'password' => 'your_db_password',
-    'charset'  => 'utf8mb4',
-];
+define('DB_HOST', 'YOURDOMAIN');
+define('DB_PORT', 3306);
+define('DB_USER', 'YOURDOMAIN');
+define('DB_PASS', 'YOURDOMAIN');
+define('DB_NAME', 'YOURDOMAIN');
 ```
 
 ### `config/mail.php`
 
 ```php
 <?php
-return [
-    'host'       => 'smtp.your-provider.com',
-    'port'       => 465,
-    'encryption' => 'ssl',          // 'ssl' or 'tls'
-    'username'   => 'your@email.com',
-    'password'   => 'your_smtp_password',
-    'from_email' => 'noreply@yourdomain.com',
-    'from_name'  => 'Logbook',
-];
+define('SMTP_HOST', 'mail.YOURDOMAIN');
+define('SMTP_USER', 'noreply@YOURDOMAIN');
+define('SMTP_PASS', 'YOURDOMAIN');
+define('SMTP_PORT', 465);
+define('SMTP_FROM_EMAIL', 'noreply@YOURDOMAIN');
+define('SMTP_FROM_NAME', 'Logbook');
+define('SMTP_SECURE', 'ssl');
 ```
 
-> ⚠️ **Never commit real credentials to version control.** Use environment variables or a `.env` file in production.
+The installer writes both files for you. These placeholder values are intentionally non-functional so the public repository does not expose real credentials or domains.
 
 ---
 

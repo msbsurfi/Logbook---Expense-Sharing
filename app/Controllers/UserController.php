@@ -83,6 +83,11 @@ class UserController {
             header('Location:/register'); return;
         }
 
+        if (!Mailer::isConfigured()) {
+            $_SESSION['flash_error'] = 'Registration is temporarily unavailable until an administrator configures email delivery.';
+            header('Location:/register'); return;
+        }
+
         if (strlen($password) < 8) {
             $_SESSION['flash_error'] = 'Password must be at least 8 characters long.';
             header('Location:/register'); return;
@@ -183,6 +188,11 @@ class UserController {
             header('Location:/login'); return;
         }
 
+        if (!Mailer::isConfigured()) {
+            $_SESSION['flash_error'] = 'Email delivery is not configured yet. Please contact an administrator.';
+            header('Location:/login'); return;
+        }
+
         $newToken = bin2hex(random_bytes(16));
         $db = new Database();
         $db->query("UPDATE users SET verification_token=:t WHERE id=:id");
@@ -269,6 +279,11 @@ class UserController {
         $email = strtolower(trim($_POST['email'] ?? ''));
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $_SESSION['flash_error'] = 'Please enter a valid email address.';
+            header('Location:/forgot-password'); return;
+        }
+
+        if (!Mailer::isConfigured()) {
+            $_SESSION['flash_error'] = 'Password reset is unavailable until email delivery is configured.';
             header('Location:/forgot-password'); return;
         }
 

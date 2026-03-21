@@ -72,8 +72,8 @@ foreach ($toastMap as $sessionKey => [$type, $title]) {
             </div>
         </div>
         <div class="footer-links">
-            <a href="mailto:info@logbook.msbsu.com">Support</a>
-            <a href="mailto:abuse@logbook.msbsu.com">Report Abuse</a>
+            <a href="mailto:support@YOURDOMAIN">Support</a>
+            <a href="mailto:abuse@YOURDOMAIN">Report Abuse</a>
             <?php if (empty($_SESSION['user_id'])): ?>
                 <a href="/login">Sign In</a>
                 <a href="/register">Register</a>
@@ -82,12 +82,50 @@ foreach ($toastMap as $sessionKey => [$type, $title]) {
                 <a href="/transactions/history">History</a>
             <?php endif; ?>
         </div>
-        <small>&copy; <?php echo date('Y'); ?> Logbook.</small>
+        <div class="footer-credit">
+            <small>&copy; <?php echo date('Y'); ?> Logbook.</small>
+            <a href="https://msbsu.com" target="_blank" rel="noopener" class="developer-link" id="developer-link">
+                <span>Developed by Murdered Soul</span>
+                <strong>msbsu.com</strong>
+            </a>
+        </div>
     </div>
 </footer>
 
 <script>
     window.__LOGBOOK_SERVER_TOASTS = <?php echo json_encode($serverToasts, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>;
+</script>
+<script>
+    (function () {
+        var developerLink = document.getElementById('developer-link');
+        if (!developerLink) {
+            return;
+        }
+
+        developerLink.addEventListener('click', function () {
+            var rect = developerLink.getBoundingClientRect();
+            var burst = document.createElement('span');
+            burst.className = 'developer-burst';
+            burst.style.left = (rect.left + (rect.width / 2)) + 'px';
+            burst.style.top = (rect.top + (rect.height / 2)) + 'px';
+
+            var colors = ['#b8860b', '#f59e0b', '#ef4444', '#0ea5e9', '#22c55e'];
+            for (var i = 0; i < 18; i++) {
+                var piece = document.createElement('span');
+                piece.className = 'developer-burst-piece';
+                piece.style.setProperty('--burst-distance', (55 + Math.random() * 55) + 'px');
+                piece.style.setProperty('--burst-angle', ((360 / 18) * i) + 'deg');
+                piece.style.setProperty('--burst-rotation', (Math.random() * 360) + 'deg');
+                piece.style.background = colors[i % colors.length];
+                burst.appendChild(piece);
+            }
+
+            document.body.appendChild(burst);
+            window.setTimeout(function () {
+                burst.remove();
+            }, 900);
+        });
+    })();
 </script>
 <script src="/js/ui.v2.js?v=<?php echo rawurlencode($scriptVersion); ?>"></script>
 

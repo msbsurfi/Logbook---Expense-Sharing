@@ -79,9 +79,9 @@ class EmailTemplate {
         <p style='margin:0 0 6px 0;font-size:14px;font-weight:700;color:#7a6020;'>Logbook &mdash; Expense Tracker</p>
         <p style='margin:0 0 8px 0;font-size:12px;color:#888;'>&copy; {$year} Logbook. All rights reserved.</p>
         <p style='margin:0;font-size:11px;color:#aaa;line-height:1.6;'>
-            Account &amp; Support: <a href='mailto:info@logbook.msbsu.com' style='color:{$themeColor};text-decoration:none;'>info@logbook.msbsu.com</a>
+            Account &amp; Support: <a href='mailto:support@YOURDOMAIN' style='color:{$themeColor};text-decoration:none;'>support@YOURDOMAIN</a>
             &nbsp;&bull;&nbsp;
-            Report Abuse: <a href='mailto:abuse@logbook.msbsu.com' style='color:{$themeColor};text-decoration:none;'>abuse@logbook.msbsu.com</a>
+            Report Abuse: <a href='mailto:abuse@YOURDOMAIN' style='color:{$themeColor};text-decoration:none;'>abuse@YOURDOMAIN</a>
         </p>
     </td>
 </tr>

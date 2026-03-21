@@ -1,4 +1,10 @@
 <?php
+require_once __DIR__ . '/../app/Lib/Install.php';
+if (Install::requiresInstallation()) {
+    header('Location: /install.php');
+    exit();
+}
+
 require_once __DIR__ . '/../app/Lib/Security.php';
 Security::bootstrap();
 

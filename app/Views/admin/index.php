@@ -2,6 +2,7 @@
 $title = 'Admin Administration';
 require_once __DIR__ . '/../layouts/header.php';
 require_once __DIR__ . '/../../Lib/Security.php';
+require_once __DIR__ . '/../../Lib/Install.php';
 
 // Helper for URL generation
 function url($tab, $params = []) {
@@ -15,6 +16,20 @@ $activeTab = $data['tab'] ?? 'dashboard';
 <div class="page-header">
     <h1><i class="fa-solid fa-shield-halved"></i> Administration</h1>
 </div>
+
+<?php if (Install::installScriptExists()): ?>
+    <div class="admin-warning-banner danger">
+        <div>
+            <strong>Security warning:</strong>
+            <span>`install.php` still exists and should be removed immediately.</span>
+        </div>
+        <form action="/fix.php" method="post">
+            <?php echo Security::csrfField(); ?>
+            <input type="hidden" name="action" value="delete_install">
+            <button type="submit" class="btn btn-danger">Delete Installer</button>
+        </form>
+    </div>
+<?php endif; ?>
 
 <div class="admin-tabs">
     <a href="<?php echo url('dashboard'); ?>" class="tab-link <?php echo $activeTab === 'dashboard' ? 'active' : ''; ?>">
@@ -306,6 +321,14 @@ $activeTab = $data['tab'] ?? 'dashboard';
         <div class="card-header">
             <h2><i class="fa-solid fa-envelope-open-text"></i> Mail / SMTP Settings</h2>
         </div>
+        <?php if (empty($data['mailConfigured'])): ?>
+            <div class="admin-warning-banner warning compact">
+                <div>
+                    <strong>Email delivery is disabled.</strong>
+                    <span>Complete SMTP setup here to enable registration emails and password resets.</span>
+                </div>
+            </div>
+        <?php endif; ?>
         <p style="color:var(--text-secondary);margin-bottom:20px;font-size:0.9rem;">
             These settings control how Logbook sends email notifications.
             Leave the password field blank to keep the existing password.
@@ -433,6 +456,34 @@ $activeTab = $data['tab'] ?? 'dashboard';
     .dashboard-card { background: var(--card-bg); padding: 24px; border-radius: 12px; border: 1px solid var(--card-border); margin-bottom: 24px; }
     .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
     .count-badge { background: var(--brand-color); color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; }
+    .admin-warning-banner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 16px 18px;
+        border-radius: 12px;
+        border: 1px solid transparent;
+        margin-bottom: 18px;
+    }
+    .admin-warning-banner span { color: var(--text-secondary); }
+    .admin-warning-banner.danger {
+        background: var(--danger-bg);
+        border-color: rgba(194, 65, 53, 0.28);
+        color: var(--danger-text);
+    }
+    .admin-warning-banner.warning {
+        background: var(--warning-bg);
+        border-color: rgba(161, 98, 7, 0.25);
+        color: var(--warning-text);
+    }
+    .admin-warning-banner.compact { margin-bottom: 20px; }
+    @media (max-width: 640px) {
+        .admin-warning-banner {
+            flex-direction: column;
+            align-items: stretch;
+        }
+    }
 </style>
 
 <?php if ($activeTab === 'dashboard'): ?>
