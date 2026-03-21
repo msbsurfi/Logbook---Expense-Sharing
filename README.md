@@ -204,16 +204,65 @@ Configure your Apache virtual host to point the document root to the `public/` d
 </VirtualHost>
 ```
 
-### 4. Run the Installer
+### 4. Run the Web Installer
 
-Visit `/install.php` in your browser. The installer will:
+**First visit:** When you open `https://yourdomain.com` (or `http://localhost`) in your browser for the first time, the application automatically detects that it has not been configured yet and **redirects you to the installer** at `/install.php`.
 
-- collect database credentials
-- optionally collect SMTP credentials or let you skip mail setup for later
-- create the database if needed
-- import `database/install.sql`
-- create the first admin account
-- hand off to `fix.php` to remove the installer script
+The installer is a single-page form divided into three sections:
+
+#### 4a. Database Settings
+
+Fill in the connection details for your MySQL / MariaDB database:
+
+| Field | Description | Default |
+|-------|-------------|---------|
+| **DB Host** | Hostname of your database server | `localhost` |
+| **DB Port** | MySQL port | `3306` |
+| **DB Name** | Database name to create or use | `logbook` |
+| **DB User** | Database username | — |
+| **DB Password** | Database password | — |
+
+The installer creates the database if it does not already exist and then imports the full schema from `database/install.sql` (all 11 tables).
+
+#### 4b. Mail Settings (optional)
+
+Configure SMTP to enable email verification, password-reset emails, and weekly summaries. You can **skip this section** and set it up later via the admin panel.
+
+| Field | Description | Example |
+|-------|-------------|---------|
+| **SMTP Host** | Your mail server hostname | `smtp.gmail.com` |
+| **SMTP Port** | SMTP port (465 for SSL, 587 for TLS) | `465` |
+| **Encryption** | `ssl` or `tls` | `ssl` |
+| **SMTP User** | SMTP login / sender address | `noreply@example.com` |
+| **SMTP Password** | SMTP password or app password | — |
+| **From Email** | The address that appears in the "From" field | `noreply@example.com` |
+| **From Name** | Display name for outgoing emails | `Logbook` |
+
+#### 4c. Administrator Account
+
+Create the **first admin account** — the only account that can approve future user registrations:
+
+| Field | Requirements |
+|-------|-------------|
+| **Name** | Any display name |
+| **Email** | A valid email address |
+| **Password** | Minimum **8 characters** |
+| **Confirm Password** | Must match the password above |
+
+This account is created with:
+- **Role** `admin` — full access to the admin panel at `/admin`
+- **Status** `active` — no approval step required
+- **Email verified** — no verification email sent; you can log in immediately
+
+#### 4d. What happens after you submit
+
+1. The installer writes `config/database.php` and `config/mail.php` with the values you provided.
+2. It creates the database (if needed) and imports the schema.
+3. The admin account is inserted into the `users` table.
+4. The installer script removes itself so it cannot be run again.
+5. You are redirected to the **login page** — log in with the admin credentials you just created.
+
+> **Note:** If the installer page appears again after completing setup, it means the config files were not written successfully — double-check that PHP has write permission to the `config/` directory.
 
 ### 5. Set File Permissions
 
