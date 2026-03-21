@@ -1,4 +1,4 @@
-# Logbook — Halkhata Debt & Expense Management System
+# Logbook — Debt & Expense Management System
 
 <p align="center">
   <img src="public/logo.png" alt="Logbook Logo" width="120" />
