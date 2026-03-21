@@ -1,7 +1,10 @@
 <?php
 class Friend {
-    private $db;
-    public function __construct(){ $this->db = new Database; }
+    private Database $db;
+
+    public function __construct(?Database $db = null){
+        $this->db = $db ?? new Database;
+    }
 
     public function friendshipExists($userId1,$userId2){
         $relationship = $this->findRelationship($userId1, $userId2);
@@ -115,5 +118,31 @@ class Friend {
         $this->db->bind(':u1', $userId1);
         $this->db->bind(':u2', $userId2);
         return $this->db->fetchOne() ? true : false;
+    }
+
+    public function ensureAcceptedFriendship(int $userId1, int $userId2, ?int $requestedBy = null): bool {
+        if ($userId1 <= 0 || $userId2 <= 0 || $userId1 === $userId2) {
+            return false;
+        }
+
+        $requestedBy ??= $userId1;
+        $existing = $this->findRelationship($userId1, $userId2);
+
+        if ($existing) {
+            if (($existing->status ?? null) === 'accepted') {
+                return true;
+            }
+
+            $this->db->query('UPDATE friends SET status="accepted", requested_by=:req, removed_by=NULL WHERE id=:id');
+            $this->db->bind(':req', $requestedBy);
+            $this->db->bind(':id', $existing->id);
+            return $this->db->execute();
+        }
+
+        $this->db->query('INSERT INTO friends (user_id_1,user_id_2,requested_by,status,removed_by) VALUES (:u1,:u2,:req,"accepted",NULL)');
+        $this->db->bind(':u1', $userId1);
+        $this->db->bind(':u2', $userId2);
+        $this->db->bind(':req', $requestedBy);
+        return $this->db->execute();
     }
 }

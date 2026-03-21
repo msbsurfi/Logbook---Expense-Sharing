@@ -117,7 +117,9 @@ class ExpenseController {
         $db = new Database();
         $expenseModel = new Expense($db);
         $transactionModel = new Transaction($db);
+        $friendModel = new Friend($db);
         $createdTxnIds = [];
+        $autoLinkedPairs = [];
 
         try {
             $db->beginTransaction();
@@ -137,6 +139,33 @@ class ExpenseController {
                 if (!$db->execute()) {
                     throw new RuntimeException('Could not save expense participants.');
                 }
+            }
+
+            $evaluatedFriendPairs = [];
+            foreach ($minimizedTxns as $txn) {
+                $userId1 = (int)$txn['lender'];
+                $userId2 = (int)$txn['borrower'];
+                $pairIds = [$userId1, $userId2];
+                sort($pairIds);
+                $pairKey = $pairIds[0] . ':' . $pairIds[1];
+
+                if (isset($evaluatedFriendPairs[$pairKey])) {
+                    continue;
+                }
+                $evaluatedFriendPairs[$pairKey] = true;
+
+                if ($friendModel->areFriends($userId1, $userId2)) {
+                    continue;
+                }
+
+                if (!$friendModel->ensureAcceptedFriendship($userId1, $userId2, $creatorId)) {
+                    throw new RuntimeException('Could not auto-link participants as friends.');
+                }
+
+                $autoLinkedPairs[] = [
+                    'user_id_1' => $pairIds[0],
+                    'user_id_2' => $pairIds[1],
+                ];
             }
 
             foreach ($minimizedTxns as $txn) {
@@ -163,6 +192,7 @@ class ExpenseController {
         }
 
         $this->sendGroupExpenseEmails($eid, $allIds, $description, $totalAmount, $shares, $paidAmounts, $createdTxnIds, $creatorId);
+        $this->sendAutoFriendshipEmails($autoLinkedPairs, $creatorId, $description);
 
         $_SESSION['flash_success'] = 'Expense created with ' . count($minimizedTxns) . ' optimized transaction(s).';
         header('Location:/dashboard');
@@ -294,6 +324,62 @@ class ExpenseController {
                 ? "You are owed ৳" . number_format($myNet, 2) . " for '{$description}'."
                 : ($myNet < 0 ? "You owe ৳" . number_format(abs($myNet), 2) . " for '{$description}'." : "Settled for '{$description}'.");
             $this->notificationModel->send($u->id, 'Group Expense', $notifMsg);
+        }
+    }
+
+    private function sendAutoFriendshipEmails(array $pairs, int $creatorId, string $description): void {
+        if (empty($pairs)) {
+            return;
+        }
+
+        $creator = $this->userModel->findUserById($creatorId);
+        $dateObj = new DateTime('now', new DateTimeZone('UTC'));
+        $dateObj->setTimezone(new DateTimeZone('Asia/Dhaka'));
+        $formattedTime = $dateObj->format('d M Y, h:i A') . ' (GMT+6)';
+        $mailer = new Mailer();
+        $userCache = [];
+
+        $getUser = function (int $userId) use (&$userCache) {
+            if (!array_key_exists($userId, $userCache)) {
+                $userCache[$userId] = $this->userModel->findUserById($userId);
+            }
+            return $userCache[$userId];
+        };
+
+        foreach ($pairs as $pair) {
+            $firstUser = $getUser((int)($pair['user_id_1'] ?? 0));
+            $secondUser = $getUser((int)($pair['user_id_2'] ?? 0));
+
+            if (!$firstUser || !$secondUser) {
+                continue;
+            }
+
+            foreach ([[$firstUser, $secondUser], [$secondUser, $firstUser]] as [$recipient, $otherUser]) {
+                if (empty($recipient->email)) {
+                    continue;
+                }
+
+                $safeOtherName = htmlspecialchars($otherUser->name);
+                $details = [
+                    'Friend' => $safeOtherName,
+                    'Connected By' => htmlspecialchars($creator->name ?? 'Logbook'),
+                    'Reason' => 'Shared group expense: ' . htmlspecialchars($description),
+                    'Linked At' => $formattedTime,
+                ];
+
+                $html = EmailTemplate::generate(
+                    'Friend Connection Created',
+                    $recipient->name,
+                    "You were added as friends with <strong>{$safeOtherName}</strong>.",
+                    'This connection was created automatically from a shared group expense so you can settle balances when needed.',
+                    $details,
+                    '#0d6efd'
+                );
+
+                $subject = 'You are now friends with ' . $otherUser->name;
+                $mailer->send($recipient->email, $recipient->name, $subject, $html);
+                $this->userModel->logEmail($recipient->id, $recipient->email, $subject);
+            }
         }
     }
 }

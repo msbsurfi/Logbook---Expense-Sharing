@@ -706,6 +706,10 @@ table {
   backdrop-filter: blur(8px);
 }
 
+.loading-overlay[hidden] {
+  display: none !important;
+}
+
 .loading-box {
   display: flex;
   align-items: center;
