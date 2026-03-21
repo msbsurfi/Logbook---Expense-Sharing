@@ -62,7 +62,7 @@ $current_user_name = htmlspecialchars($current_user_name_text);
                         <input class="participant-checkbox" type="checkbox" name="participants[]" value="<?php echo $current_user_id; ?>" checked>
                         <span class="participant-copy">
                             <span class="participant-name"><?php echo $current_user_name; ?> <span class="participant-tag">You</span></span>
-                            <span class="participant-hint">Default payer and participant.</span>
+                            <span class="participant-hint">Fill below only if you shared this expense.</span>
                         </span>
                     </label>
                     <div class="paid-amount-wrapper">
@@ -76,7 +76,7 @@ $current_user_name = htmlspecialchars($current_user_name_text);
                             <input class="participant-checkbox" type="checkbox" name="participants[]" value="<?php echo $friend->id; ?>">
                             <span class="participant-copy">
                                 <span class="participant-name"><?php echo htmlspecialchars($friend->name); ?></span>
-                                <span class="participant-hint">Include only if they shared this expense.</span>
+                                <span class="participant-hint">Fill below only if they shared this expense.</span>
                             </span>
                         </label>
                         <div class="paid-amount-wrapper">
