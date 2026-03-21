@@ -3,9 +3,7 @@ class User {
     private Database $db;
     public function __construct(){ $this->db = new Database; }
 
-    /* =========================
-       Retrieval / Lookup
-       ========================= */
+    
     public function findUserByEmail(string $email){
         $this->db->query('SELECT * FROM users WHERE email = :email LIMIT 1');
         $this->db->bind(':email',$email);
@@ -46,9 +44,7 @@ class User {
         return $this->db->fetchOne();
     }
 
-    /* =========================
-       Creation / Updates
-       ========================= */
+    
     public function createUserWithVerification(array $data): bool {
         $this->db->query('INSERT INTO users (name,email,phone,password,profile_code,verification_token,email_verified,status,role)
                           VALUES (:name,:email,:phone,:password,:profile_code,:token,0,"pending_approval","user")');
@@ -67,46 +63,41 @@ class User {
         return $this->db->execute();
     }
 
-    /* =========================
-       Rate Limiting Resend Verification
-       Columns required:
-         verification_resend_count INT NOT NULL DEFAULT 0
-         last_verification_resend_at TIMESTAMP NULL
-       ========================= */
+    
     public function updateResendVerificationStats(int $userId): bool {
-        // Fetch current count and timestamp
+        
         $this->db->query("SELECT verification_resend_count,last_verification_resend_at FROM users WHERE id=:id LIMIT 1");
         $this->db->bind(':id',$userId);
         $row = $this->db->fetchOne();
 
-        // If columns missing (older schema), skip limiting to avoid fatal error.
+        
         if (!$row || !property_exists($row,'verification_resend_count')) {
-            return true; // allow until schema fixed
+            return true; 
         }
 
         $count = (int)$row->verification_resend_count;
         $last  = $row->last_verification_resend_at;
 
         $now = time();
-        $minIntervalSeconds = 5 * 60; // 5 minutes
+        $minIntervalSeconds = 5 * 60; 
         $maxPerDay          = 5;
 
-        // Reset daily count if last resend older than 24h
+        
         if ($last && ($now - strtotime($last) > 86400)) {
             $count = 0;
         }
 
-        // Too many overall today?
+        
         if ($count >= $maxPerDay) {
             return false;
         }
 
-        // Too soon since last?
+        
         if ($last && ($now - strtotime($last) < $minIntervalSeconds)) {
             return false;
         }
 
-        // Increment & store
+        
         $count++;
         $this->db->query("UPDATE users SET verification_resend_count=:c, last_verification_resend_at=NOW() WHERE id=:id");
         $this->db->bind(':c',$count);
@@ -114,9 +105,7 @@ class User {
         return $this->db->execute();
     }
 
-    /* =========================
-       Profile Code Generation
-       ========================= */
+    
     public function generateUniqueProfileCode(string $baseName, int $maxAttempts=20): string {
         $prefix = strtoupper(substr(preg_replace('/\s+/','', $baseName),0,3));
         if ($prefix === '') $prefix = 'USR';
@@ -127,9 +116,7 @@ class User {
         return $prefix . '-' . (time() % 1000);
     }
 
-    /* =========================
-       Email Logging
-       ========================= */
+    
     public function logEmail($userId,$email,$subject): void {
         $this->db->query("INSERT INTO email_log (user_id,email,subject) VALUES (:uid,:email,:sub)");
         $this->db->bind(':uid',$userId);
@@ -138,9 +125,7 @@ class User {
         $this->db->execute();
     }
 
-    /* =========================
-       Admin Workflow Helpers
-       ========================= */
+    
     public function getPendingUsers(){
         $this->db->query("SELECT id,name,email,created_at FROM users WHERE status='pending_approval' AND rejected_at IS NULL AND banned_at IS NULL ORDER BY created_at DESC");
         return $this->db->fetchAll();
@@ -184,9 +169,7 @@ class User {
         return $this->db->execute();
     }
 
-    /* =========================
-       Pagination & Filters (if needed by Admin)
-       ========================= */
+    
     public function countFilteredUsers(array $filters): int {
         $sql = "SELECT COUNT(*) AS c FROM users WHERE 1=1";
         if ($filters['role'])   $sql .= " AND role = :role";

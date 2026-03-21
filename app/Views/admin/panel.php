@@ -3,7 +3,7 @@ $title = 'Admin Panel';
 require_once __DIR__ . '/../layouts/header.php';
 require_once __DIR__ . '/../../Lib/Security.php';
 
-// Helper to keep query params when switching pages
+
 function build_url($params = []) {
     return '/admin?' . http_build_query(array_merge($_GET, $params));
 }
@@ -15,10 +15,10 @@ function build_url($params = []) {
 </div>
 
 <div class="admin-grid">
-    <!-- Main Content: User List -->
+    
     <div class="main-column">
         <div class="dashboard-card">
-            <!-- Tabs -->
+            
             <div class="nav-tabs">
                 <a href="<?php echo build_url(['status' => '', 'page' => 1]); ?>" 
                    class="nav-link <?php echo empty($data['filters']['status']) ? 'active' : ''; ?>">All</a>
@@ -36,7 +36,7 @@ function build_url($params = []) {
                 </a>
             </div>
 
-            <!-- Mobile-Friendly User Table -->
+            
             <div class="responsive-table-container">
                 <table class="admin-table mobile-stack">
                     <thead>
@@ -73,7 +73,7 @@ function build_url($params = []) {
                                 </td>
                                 <td data-label="Actions">
                                     <div class="action-buttons">
-                                        <!-- Impersonate -->
+                                        
                                         <?php if ($u->id != $_SESSION['user_id']): ?>
                                         <form action="/admin/impersonate/<?php echo $u->id; ?>" method="post">
                                             <?php echo Security::csrfField(); ?>
@@ -81,7 +81,7 @@ function build_url($params = []) {
                                         </form>
                                         <?php endif; ?>
 
-                                        <!-- Approve (if pending) -->
+                                        
                                         <?php if ($u->status === 'pending_approval'): ?>
                                             <form action="/admin/approve/<?php echo $u->id; ?>" method="post">
                                                 <?php echo Security::csrfField(); ?>
@@ -89,7 +89,7 @@ function build_url($params = []) {
                                             </form>
                                         <?php endif; ?>
 
-                                        <!-- Ban / Unban -->
+                                        
                                         <?php if ($u->banned_at): ?>
                                             <form action="/admin/unban/<?php echo $u->id; ?>" method="post">
                                                 <?php echo Security::csrfField(); ?>
@@ -102,7 +102,7 @@ function build_url($params = []) {
                                             </form>
                                         <?php endif; ?>
                                         
-                                        <!-- Make Admin/User -->
+                                        
                                         <?php if ($u->role === 'user'): ?>
                                             <form action="/admin/promote/<?php echo $u->id; ?>" method="post" onsubmit="return confirm('Make this user an Admin?');">
                                                 <?php echo Security::csrfField(); ?>
@@ -124,7 +124,7 @@ function build_url($params = []) {
                 </table>
             </div>
 
-            <!-- Pagination -->
+            
             <?php if ($data['totalPages'] > 1): ?>
             <div class="pagination">
                 <?php for($i=1; $i<=$data['totalPages']; $i++): ?>
@@ -136,9 +136,9 @@ function build_url($params = []) {
         </div>
     </div>
 
-    <!-- Sidebar: Filters & Stats -->
+    
     <div class="sidebar-column">
-        <!-- Search & Filter -->
+        
         <div class="dashboard-card">
             <h3><i class="fa-solid fa-filter"></i> Search</h3>
             <form method="get" action="/admin" class="sidebar-form">
@@ -155,7 +155,7 @@ function build_url($params = []) {
             </form>
         </div>
 
-        <!-- Data Exports -->
+        
         <div class="dashboard-card">
             <h3><i class="fa-solid fa-download"></i> Exports</h3>
             <div class="sidebar-links">
@@ -171,7 +171,7 @@ function build_url($params = []) {
             </div>
         </div>
 
-        <!-- Stop Impersonation Alert -->
+        
         <?php if (!empty($_SESSION['impersonator_admin_id'])): ?>
         <div class="dashboard-card alert-card">
             <h3>Impersonating</h3>
@@ -186,36 +186,36 @@ function build_url($params = []) {
 </div>
 
 <style>
-    /* CSS Grid Layout */
+    
     .admin-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
     @media (min-width: 1024px) { .admin-grid { grid-template-columns: 3fr 1fr; } }
 
-    /* Tabs */
+    
     .nav-tabs { display: flex; gap: 4px; overflow-x: auto; margin-bottom: 16px; border-bottom: 2px solid var(--card-border); }
     .nav-link { padding: 10px 16px; color: var(--text-secondary); text-decoration: none; font-weight: 500; white-space: nowrap; border-bottom: 2px solid transparent; margin-bottom: -2px; }
     .nav-link.active { color: var(--brand-color); border-bottom-color: var(--brand-color); }
 
-    /* User Cell */
+    
     .user-cell { display: flex; align-items: center; gap: 12px; }
     .user-avatar-small { width: 32px; height: 32px; background: var(--brand-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem; }
     .user-cell small { display: block; color: var(--text-secondary); font-size: 0.8rem; }
 
-    /* Buttons */
+    
     .btn-icon { background: none; border: none; cursor: pointer; padding: 6px; font-size: 1rem; color: var(--text-secondary); transition: transform 0.2s; }
     .btn-icon:hover { transform: scale(1.1); }
     .text-success { color: var(--success-color); }
     .text-danger { color: var(--danger-color); }
     .text-primary { color: var(--brand-color); }
-    .text-warning { color: #f59e0b; }
+    .text-warning { color: 
     
-    /* Sidebar */
+    
     .sidebar-form { display: flex; flex-direction: column; gap: 12px; }
     .sidebar-form input, .sidebar-form select { padding: 10px; border-radius: 6px; border: 1px solid var(--card-border); background: var(--input-bg); color: var(--text-primary); width: 100%; }
     .sidebar-links { display: flex; flex-direction: column; gap: 8px; }
     .sidebar-btn { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 6px; background: var(--input-bg); color: var(--text-primary); text-decoration: none; font-size: 0.9rem; transition: background 0.2s; }
     .sidebar-btn:hover { background: var(--card-border); }
     
-    /* Mobile Stack Table (Repeated for safety) */
+    
     @media (max-width: 768px) {
         .admin-table.mobile-stack thead { display: none; }
         .admin-table.mobile-stack tbody tr { display: block; padding: 16px; border-bottom: 1px solid var(--card-border); }
@@ -224,13 +224,13 @@ function build_url($params = []) {
         .admin-table.mobile-stack .action-buttons { justify-content: flex-end; }
     }
     
-    /* Badges */
+    
     .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
-    .role-admin { background: #e0f2fe; color: #0369a1; }
-    .role-user { background: #f1f5f9; color: #64748b; }
-    .status-active { background: #dcfce7; color: #15803d; }
-    .status-suspended { background: #fee2e2; color: #b91c1c; }
-    .status-pending { background: #fef3c7; color: #b45309; }
+    .role-admin { background: 
+    .role-user { background: 
+    .status-active { background: 
+    .status-suspended { background: 
+    .status-pending { background: 
 </style>
 
 <?php require_once __DIR__ . '/../layouts/footer.php'; ?>

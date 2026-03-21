@@ -230,8 +230,8 @@ $current_user_name = htmlspecialchars($current_user_name_text);
     .payment-summary-bar.invalid { background-color: var(--danger-bg); color: var(--danger-text); border-color: var(--danger-color); }
     .payment-summary-bar.partial { background-color: var(--warning-bg); color: var(--warning-text); border-color: var(--warning-color); }
 
-    #custom-shares-container { margin-top: 24px; border-top: 1px solid var(--card-border); padding-top: 24px; }
-    #custom-shares-list { display: flex; flex-direction: column; gap: 16px; }
+    
+    
     .share-item {
         display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 16px;
         padding: 14px; border-radius: 14px; background: var(--input-bg); border: 1px solid var(--card-border);

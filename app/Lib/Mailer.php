@@ -25,7 +25,7 @@ class Mailer {
         $this->mail->Password   = SMTP_PASS;
         $this->mail->SMTPSecure = SMTP_SECURE ?? 'tls';
         $this->mail->Port       = SMTP_PORT;
-        $this->mail->Timeout    = 15;            // seconds
+        $this->mail->Timeout    = 15;            
         $this->mail->SMTPKeepAlive = false;
         $this->mail->setFrom(SMTP_FROM_EMAIL, SMTP_FROM_NAME);
         $this->mail->isHTML(true);

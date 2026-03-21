@@ -3,8 +3,8 @@ $title = 'My Friends';
 require_once __DIR__ . '/../layouts/header.php'; 
 require_once __DIR__ . '/../../Lib/Security.php';
 
-// Note: Ensure your controller populates $data['sent_requests'] 
-// by querying friends table where requested_by = current_user AND status = 'pending'
+
+
 ?>
 
 <div class="page-header">
@@ -13,7 +13,7 @@ require_once __DIR__ . '/../../Lib/Security.php';
 </div>
 
 <div class="friends-page-grid">
-    <!-- Add Friend Card -->
+    
     <div class="dashboard-card">
         <div class="card-header">
             <h2><i class="fa-solid fa-user-plus"></i> Add a Friend</h2>
@@ -33,7 +33,7 @@ require_once __DIR__ . '/../../Lib/Security.php';
         </form>
     </div>
 
-    <!-- Incoming Requests Card -->
+    
     <div class="dashboard-card">
         <div class="card-header">
             <h2><i class="fa-solid fa-inbox"></i> Incoming Requests</h2>
@@ -70,7 +70,7 @@ require_once __DIR__ . '/../../Lib/Security.php';
         </div>
     </div>
 
-    <!-- Sent Requests Card (New) -->
+    
     <div class="dashboard-card">
         <div class="card-header">
             <h2><i class="fa-solid fa-paper-plane"></i> Sent Requests</h2>
@@ -89,7 +89,7 @@ require_once __DIR__ . '/../../Lib/Security.php';
                     <div class="friend-actions">
                         <form action="/friends/cancel/<?php echo $sr->id; ?>" method="post">
                             <?php echo Security::csrfField(); ?>
-                            <!-- Cancelling deletes the record, effectively same as unfriend/decline logic -->
+                            
                             <button class="btn btn-danger disable-on-click" type="submit" title="Cancel Request">
                                 <i class="fa-solid fa-xmark"></i> Cancel
                             </button>
@@ -107,7 +107,7 @@ require_once __DIR__ . '/../../Lib/Security.php';
         </div>
     </div>
 
-    <!-- Your Friends Card -->
+    
     <div class="dashboard-card">
         <div class="card-header">
             <h2><i class="fa-solid fa-users"></i> Your Friends</h2>
@@ -121,7 +121,7 @@ require_once __DIR__ . '/../../Lib/Security.php';
                     </div>
                     <div class="friend-actions">
                         <a class="btn secondary" href="/transactions/settle/<?php echo $f->id; ?>">Settle Up</a>
-                        <!-- Changed to trigger modal instead of direct submit -->
+                        
                         <button class="btn btn-danger" type="button" 
                                 onclick="openUnfriendModal(<?php echo $f->id; ?>, '<?php echo htmlspecialchars($f->name, ENT_QUOTES); ?>')" 
                                 title="Unfriend">
@@ -141,7 +141,7 @@ require_once __DIR__ . '/../../Lib/Security.php';
     </div>
 </div>
 
-<!-- Unfriend Confirmation Modal -->
+
 <div id="unfriendModal" class="modal-overlay" style="display: none;">
     <div class="modal-content dashboard-card">
         <div class="modal-header">
@@ -169,7 +169,7 @@ require_once __DIR__ . '/../../Lib/Security.php';
 </div>
 
 <style>
-    /* Existing Styles */
+    
     .page-header h1 { margin: 0 0 4px 0; color: var(--text-primary); }
     .page-header .subtitle { color: var(--text-secondary); margin: 0 0 24px 0; }
     
@@ -199,7 +199,7 @@ require_once __DIR__ . '/../../Lib/Security.php';
         width: 100%; padding: 12px 12px 12px 40px; border: 1px solid var(--card-border); border-radius: 8px; font-size: 1rem;
         background-color: var(--input-bg); color: var(--text-primary);
     }
-    .form-control { padding-left: 12px; } /* Reset padding for modal input */
+    .form-control { padding-left: 12px; } 
     
     .friends-list { display: flex; flex-direction: column; gap: 12px; }
     .friend-item {
@@ -226,7 +226,7 @@ require_once __DIR__ . '/../../Lib/Security.php';
     .empty-state p { font-size: 1.2rem; font-weight: 600; margin: 16px 0 4px; color: var(--text-primary); }
     .empty-state span { color: var(--text-secondary); }
 
-    /* Modal Styles */
+    
     .modal-overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background-color: rgba(0, 0, 0, 0.5); z-index: 1000;
@@ -259,15 +259,15 @@ require_once __DIR__ . '/../../Lib/Security.php';
     const modalFriendName = document.getElementById('modalFriendName');
 
     function openUnfriendModal(friendId, friendName) {
-        // Set dynamic data
+        
         unfriendForm.action = '/friends/unfriend/' + friendId;
         modalFriendName.textContent = friendName;
         
-        // Reset state
+        
         confirmInput.value = '';
         confirmBtn.disabled = true;
         
-        // Show modal
+        
         modal.style.display = 'flex';
         confirmInput.focus();
     }
@@ -276,7 +276,7 @@ require_once __DIR__ . '/../../Lib/Security.php';
         modal.style.display = 'none';
     }
 
-    // Validation Logic
+    
     confirmInput.addEventListener('input', function() {
         if (this.value === 'CONFIRM') {
             confirmBtn.disabled = false;

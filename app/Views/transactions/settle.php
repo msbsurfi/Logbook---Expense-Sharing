@@ -1,9 +1,9 @@
 <?php
 $title = 'Settle With ' . htmlspecialchars($data['friend']->name);
-require_once __DIR__ . '/../layouts/header.php'; // Your modern, theme-aware header
+require_once __DIR__ . '/../layouts/header.php'; 
 require_once __DIR__ . '/../../Lib/Security.php';
 
-// Pre-calculate totals for the summary display
+
 $total_you_owe = 0;
 $total_owed_to_you = 0;
 if (!empty($data['transactions'])) {
@@ -23,7 +23,7 @@ $net_balance = $total_owed_to_you - $total_you_owe;
     <p class="subtitle">Select transactions below to mark them as paid.</p>
 </div>
 
-<!-- Financial Summary Card -->
+
 <div class="dashboard-card summary-card">
     <div class="summary-item">
         <span class="label">Total You Owe</span>
@@ -83,7 +83,7 @@ $net_balance = $total_owed_to_you - $total_you_owe;
     </div>
 </form>
 
-<!-- Sticky Action Bar -->
+
 <?php if (!empty($data['transactions'])) : ?>
 <div class="settle-summary-bar">
     <div class="container summary-content">
@@ -124,14 +124,14 @@ $net_balance = $total_owed_to_you - $total_you_owe;
         margin-bottom: 12px;
     }
     .transaction-item:hover { background-color: var(--input-bg); }
-    .transaction-item.selected { background-color: var(--brand-color-light); border-color: var(--brand-color); } /* Define --brand-color-light in your header */
+    .transaction-item.selected { background-color: var(--brand-color-light); border-color: var(--brand-color); } 
     .transaction-details { flex-grow: 1; }
     .transaction-details strong { display: block; color: var(--text-primary); }
     .transaction-details span { color: var(--text-secondary); font-size: 0.9rem; }
     .transaction-amount { text-align: right; font-weight: 600; }
     .transaction-amount small { display: block; font-weight: 400; font-size: 0.8rem; }
 
-    /* Custom Checkbox */
+    
     .custom-checkbox { position: relative; padding-left: 30px; }
     .custom-checkbox input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
     .custom-checkbox .checkmark {
@@ -142,7 +142,7 @@ $net_balance = $total_owed_to_you - $total_you_owe;
     .custom-checkbox .checkmark:after { content: ""; position: absolute; display: none; left: 6px; top: 2px; width: 5px; height: 10px; border: solid white; border-width: 0 3px 3px 0; transform: rotate(45deg); }
     .custom-checkbox input:checked ~ .checkmark:after { display: block; }
 
-    /* Sticky Action Bar */
+    
     .settle-summary-bar {
         position: sticky; bottom: 0; left: 0; width: 100%;
         background-color: var(--card-bg); box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
@@ -152,7 +152,7 @@ $net_balance = $total_owed_to_you - $total_you_owe;
     .summary-content { display: flex; justify-content: space-between; align-items: center; }
     .selection-info strong { display: block; color: var(--text-primary); font-size: 1.1rem; }
     .selection-info span { color: var(--text-secondary); }
-    #settle-submit-btn { padding: 12px 24px; font-size: 1rem; }
+    
     
     .empty-state { text-align: center; padding: 40px 20px; }
     .empty-state i { font-size: 3rem; color: var(--text-secondary); }
@@ -163,7 +163,7 @@ $net_balance = $total_owed_to_you - $total_you_owe;
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('settle-form');
-    if (!form) return; // Exit if there are no transactions to settle
+    if (!form) return; 
 
     const transactionItems = form.querySelectorAll('.transaction-item');
     const selectAllCheckbox = document.getElementById('select-all-checkbox');
@@ -207,10 +207,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Make the entire item clickable
+    
     transactionItems.forEach(item => {
         item.addEventListener('click', (e) => {
-            // Don't interfere with clicks directly on the checkbox
+            
             if (e.target.type !== 'checkbox') {
                 const checkbox = item.querySelector('input[type="checkbox"]');
                 checkbox.checked = !checkbox.checked;
@@ -219,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Handle "Select All" functionality
+    
     if (selectAllCheckbox) {
         selectAllCheckbox.addEventListener('change', () => {
             transactionItems.forEach(item => {
@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Initial state
+    
     if (summaryBar) {
       summaryBar.style.display = 'none';
     }

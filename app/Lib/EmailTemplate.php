@@ -6,31 +6,31 @@ class EmailTemplate {
         string $mainMsg,
         string $subMsg,
         array $details,
-        string $themeColor = '#C9A227',
+        string $themeColor = '
         array $transactionCards = []
     ): string {
         $detailsHtml = '';
         foreach ($details as $label => $value) {
             $detailsHtml .= "<tr>
-                <td style='padding:8px 0;color:#666;font-size:14px;width:45%;vertical-align:top;'>" . htmlspecialchars((string)$label) . "</td>
-                <td style='padding:8px 0;color:#333;font-size:14px;font-weight:600;text-align:right;'>{$value}</td>
+                <td style='padding:8px 0;color:
+                <td style='padding:8px 0;color:
             </tr>
-            <tr><td colspan='2' style='border-bottom:1px solid #eee;font-size:1px;line-height:1px;'></td></tr>";
+            <tr><td colspan='2' style='border-bottom:1px solid 
         }
 
         $cardsHtml = '';
         if (!empty($transactionCards)) {
-            $cardsHtml = "<h3 style='margin:24px 0 12px 0;font-size:16px;color:#333;font-weight:600;'>Transaction Breakdown</h3>";
+            $cardsHtml = "<h3 style='margin:24px 0 12px 0;font-size:16px;color:
             foreach ($transactionCards as $card) {
                 $cardRows = '';
                 foreach ($card as $lbl => $val) {
                     $cardRows .= "<tr>
-                        <td style='padding:5px 0;color:#666;font-size:13px;width:45%;'>" . htmlspecialchars((string)$lbl) . "</td>
-                        <td style='padding:5px 0;color:#333;font-size:13px;font-weight:600;text-align:right;'>{$val}</td>
+                        <td style='padding:5px 0;color:
+                        <td style='padding:5px 0;color:
                     </tr>";
                 }
                 $cardsHtml .= "<table role='presentation' cellspacing='0' cellpadding='0' border='0' width='100%'
-                    style='background:#ffffff;border-radius:8px;border:1px solid #dee2e6;margin-bottom:10px;'>
+                    style='background:
                     <tr><td style='padding:14px;'>
                         <table role='presentation' cellspacing='0' cellpadding='0' border='0' width='100%'>{$cardRows}</table>
                     </td></tr></table>";
@@ -45,23 +45,23 @@ class EmailTemplate {
 <meta name='viewport' content='width=device-width,initial-scale=1.0'>
 <title>{$title}</title>
 </head>
-<body style='margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif;background-color:#f4f6f8;color:#333;'>
-<table role='presentation' cellspacing='0' cellpadding='0' border='0' width='100%' style='background-color:#f4f6f8;padding:40px 0;'>
+<body style='margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif;background-color:
+<table role='presentation' cellspacing='0' cellpadding='0' border='0' width='100%' style='background-color:
 <tr><td align='center'>
 <table role='presentation' cellspacing='0' cellpadding='0' border='0' width='600'
-    style='background-color:#ffffff;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.08);overflow:hidden;max-width:90%;'>
+    style='background-color:
 <tr>
     <td style='background-color:{$themeColor};padding:28px 24px;text-align:center;'>
-        <h1 style='margin:0;color:#ffffff;font-size:22px;font-weight:700;letter-spacing:0.3px;'>{$title}</h1>
+        <h1 style='margin:0;color:
     </td>
 </tr>
 <tr>
     <td style='padding:32px 28px;'>
-        <p style='margin:0 0 16px 0;font-size:16px;color:#333;'>Hello <strong>{$userName}</strong>,</p>
-        <p style='margin:0 0 8px 0;font-size:16px;line-height:1.6;color:#333;'>{$mainMsg}</p>
-        <p style='margin:0 0 28px 0;font-size:14px;color:#666;line-height:1.5;'>{$subMsg}</p>
+        <p style='margin:0 0 16px 0;font-size:16px;color:
+        <p style='margin:0 0 8px 0;font-size:16px;line-height:1.6;color:
+        <p style='margin:0 0 28px 0;font-size:14px;color:
         <table role='presentation' cellspacing='0' cellpadding='0' border='0' width='100%'
-            style='background-color:#f8f9fa;border-radius:8px;border:1px solid #e9ecef;margin-bottom:24px;'>
+            style='background-color:
             <tr><td style='padding:18px;'>
                 <table role='presentation' cellspacing='0' cellpadding='0' border='0' width='100%'>
                     {$detailsHtml}
@@ -69,16 +69,16 @@ class EmailTemplate {
             </td></tr>
         </table>
         {$cardsHtml}
-        <p style='margin:16px 0 0 0;font-size:12px;color:#aaa;text-align:center;line-height:1.4;'>
+        <p style='margin:16px 0 0 0;font-size:12px;color:
             This is an automated notification from Logbook. Please do not reply to this email.
         </p>
     </td>
 </tr>
 <tr>
-    <td style='background-color:#f8f4e8;padding:20px 28px;text-align:center;border-top:3px solid {$themeColor};'>
-        <p style='margin:0 0 6px 0;font-size:14px;font-weight:700;color:#7a6020;'>Logbook &mdash; Expense Tracker</p>
-        <p style='margin:0 0 8px 0;font-size:12px;color:#888;'>&copy; {$year} Logbook. All rights reserved.</p>
-        <p style='margin:0;font-size:11px;color:#aaa;line-height:1.6;'>
+    <td style='background-color:
+        <p style='margin:0 0 6px 0;font-size:14px;font-weight:700;color:
+        <p style='margin:0 0 8px 0;font-size:12px;color:
+        <p style='margin:0;font-size:11px;color:
             Account &amp; Support: <a href='mailto:support@YOURDOMAIN' style='color:{$themeColor};text-decoration:none;'>support@YOURDOMAIN</a>
             &nbsp;&bull;&nbsp;
             Report Abuse: <a href='mailto:abuse@YOURDOMAIN' style='color:{$themeColor};text-decoration:none;'>abuse@YOURDOMAIN</a>

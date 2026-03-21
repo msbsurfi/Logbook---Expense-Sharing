@@ -10,25 +10,25 @@ $logoVersion = (string) (
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#b8860b">
+  <meta name="theme-color" content="
   <link rel="icon" type="image/png" href="/favicon.png?v=<?php echo rawurlencode($logoVersion); ?>">
   <link rel="shortcut icon" href="/favicon.png?v=<?php echo rawurlencode($logoVersion); ?>">
   <link rel="apple-touch-icon" href="/logo.png?v=<?php echo rawurlencode($logoVersion); ?>">
   <title>Register - Logbook</title>
   
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer">
+  <link rel="stylesheet" href="https:
 
   <style>
-    /* --- CSS STYLES --- */
+    
 
-    /* --- Global Styles & Variables (Consistent with Login Page) --- */
+    
     :root {
-      --primary-color: #b8860b;
-      --primary-hover: #906707;
-      --background-color: #f6f1e6;
+      --primary-color: 
+      --primary-hover: 
+      --background-color: 
       --card-background: rgba(255, 251, 245, 0.98);
-      --text-color: #1f1b16;
-      --subtext-color: #6b5f51;
+      --text-color: 
+      --subtext-color: 
       --border-color: rgba(97, 74, 28, 0.16);
     }
 
@@ -39,14 +39,14 @@ $logoVersion = (string) (
         var(--background-color);
       color: var(--text-color);
       margin: 0;
-      padding: 20px 0; /* Add padding for scroll on small screens */
+      padding: 20px 0; 
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
     }
 
-    /* --- Main Container & Card --- */
+    
     .register-container {
       max-width: 480px;
       width: 100%;
@@ -99,7 +99,7 @@ $logoVersion = (string) (
       margin: 0 0 30px;
     }
 
-    /* --- Form Elements --- */
+    
     .register-form {
       display: flex;
       flex-direction: column;
@@ -115,19 +115,19 @@ $logoVersion = (string) (
       top: 50%;
       left: 15px;
       transform: translateY(-50%);
-      color: #aaa;
+      color: 
     }
 
     .form-group input[type="text"],
     .form-group input[type="email"],
     .form-group input[type="password"] {
       width: 100%;
-      padding: 14px 14px 14px 45px; /* Left padding for icon */
+      padding: 14px 14px 14px 45px; 
       border: 1px solid var(--border-color);
       border-radius: 8px;
       font-size: 1rem;
       transition: border-color 0.2s, box-shadow 0.2s;
-      box-sizing: border-box; /* Important for padding */
+      box-sizing: border-box; 
     }
 
     .form-group input:focus {
@@ -136,7 +136,7 @@ $logoVersion = (string) (
       box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
     }
     
-    /* --- Checkbox Group --- */
+    
     .form-group-checkbox {
       display: flex;
       align-items: center;
@@ -156,7 +156,7 @@ $logoVersion = (string) (
       color: var(--subtext-color);
     }
 
-    /* --- Button --- */
+    
     .btn {
       background-color: var(--primary-color);
       color: white;
@@ -175,18 +175,18 @@ $logoVersion = (string) (
     }
     
     .btn:disabled {
-        background-color: #ccc;
+        background-color: 
         cursor: not-allowed;
     }
     
-    /* --- Honeypot Field (Hidden from users) --- */
+    
     .honeypot {
         position: absolute;
         left: -5000px;
         top: -5000px;
     }
 
-    /* --- Links --- */
+    
     a {
       color: var(--primary-color);
       text-decoration: none;
@@ -202,7 +202,7 @@ $logoVersion = (string) (
       font-size: 0.9rem;
     }
     
-    /* --- Modal Styles --- */
+    
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -248,7 +248,7 @@ $logoVersion = (string) (
       background: none;
       border: none;
       font-size: 2rem;
-      color: #aaa;
+      color: 
       cursor: pointer;
     }
     
@@ -275,14 +275,14 @@ $logoVersion = (string) (
     <p class="subtitle">Join Logbook today. It's free and always will be.</p>
 
     <?php if (!empty($_SESSION['flash_error'])): ?>
-      <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 15px;border-radius:8px;margin-bottom:18px;background:#fdecea;color:#d93025;text-align:left;">
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 15px;border-radius:8px;margin-bottom:18px;background:
         <i class="fa-solid fa-circle-exclamation"></i>
         <span><?php echo htmlspecialchars($_SESSION['flash_error']); unset($_SESSION['flash_error']); ?></span>
       </div>
     <?php endif; ?>
 
     <?php if (!empty($_SESSION['flash_success'])): ?>
-      <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 15px;border-radius:8px;margin-bottom:18px;background:#e9f7ef;color:#1e7e34;text-align:left;">
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 15px;border-radius:8px;margin-bottom:18px;background:
         <i class="fa-solid fa-circle-check"></i>
         <span><?php echo htmlspecialchars($_SESSION['flash_success']); unset($_SESSION['flash_success']); ?></span>
       </div>
@@ -291,7 +291,7 @@ $logoVersion = (string) (
     <form action="/register" method="post" class="register-form">
       <?php echo Security::csrfField(); ?>
       
-      <!-- Honeypot Field for Spam Protection -->
+      
       <div class="honeypot">
           <label for="website_url">Do not fill this out</label>
           <input type="text" id="website_url" name="website_url" tabindex="-1" autocomplete="off">
@@ -319,7 +319,7 @@ $logoVersion = (string) (
       
       <div class="form-group-checkbox">
           <input type="checkbox" id="terms" name="terms" required>
-          <label for="terms">I agree to the <a href="#" id="termsLink">Terms and Conditions</a></label>
+          <label for="terms">I agree to the <a href="
       </div>
 
       <button class="btn disable-on-click" type="submit">Create Account</button>
@@ -331,7 +331,7 @@ $logoVersion = (string) (
   </div>
 </div>
 
-<!-- Terms and Conditions Modal -->
+
 <div class="modal-overlay" id="termsModal">
   <div class="modal-content">
     <button class="close-modal" id="closeTermsModal">&times;</button>
@@ -371,21 +371,21 @@ $logoVersion = (string) (
     const registerForm = document.querySelector('.register-form');
     const honeypotInput = document.getElementById('website_url');
 
-    // --- Honeypot Spam Prevention ---
+    
     if (registerForm) {
         registerForm.addEventListener('submit', function(e) {
-            // Check if the honeypot field is filled out
+            
             if (honeypotInput.value.length > 0) {
-                // It's likely a bot, so we block the submission silently
+                
                 console.log('Honeypot triggered. Form submission blocked.');
                 e.preventDefault(); 
                 return false;
             }
             
-            // --- Disable Button on Valid Submit ---
+            
             const submitButton = registerForm.querySelector('.disable-on-click');
             if (submitButton) {
-                // Small delay to ensure form data is captured before disabling
+                
                 setTimeout(() => {
                     submitButton.disabled = true;
                     submitButton.textContent = 'Creating Account...';
@@ -394,7 +394,7 @@ $logoVersion = (string) (
         });
     }
 
-    // --- Terms and Conditions Modal Functionality ---
+    
     const termsModal = document.getElementById('termsModal');
     const termsLink = document.getElementById('termsLink');
     const closeTermsModal = document.getElementById('closeTermsModal');
@@ -412,14 +412,14 @@ $logoVersion = (string) (
       termsLink.addEventListener('click', openModal);
       closeTermsModal.addEventListener('click', closeModal);
 
-      // Close modal by clicking outside
+      
       termsModal.addEventListener('click', (e) => {
         if (e.target === termsModal) {
           closeModal();
         }
       });
 
-      // Close modal with Escape key
+      
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && termsModal.classList.contains('active')) {
           closeModal();

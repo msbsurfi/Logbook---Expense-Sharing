@@ -51,12 +51,12 @@ $isActive = static function (string $path) use ($currentPath): bool {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark">
-    <meta name="theme-color" content="#b8860b">
+    <meta name="theme-color" content="
     <link rel="icon" type="image/png" href="/favicon.png?v=<?php echo rawurlencode($logoVersion); ?>">
     <link rel="shortcut icon" href="/favicon.png?v=<?php echo rawurlencode($logoVersion); ?>">
     <link rel="apple-touch-icon" href="/logo.png?v=<?php echo rawurlencode($logoVersion); ?>">
     <title><?php echo htmlspecialchars($title ?? 'Logbook'); ?></title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="https:
     <link rel="stylesheet" href="/css/style.v3.css?v=<?php echo rawurlencode($assetVersion); ?>">
     <script>
         (function () {

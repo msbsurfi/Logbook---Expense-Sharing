@@ -10,7 +10,7 @@ require_once __DIR__ . '/../../Lib/Security.php';
 </div>
 
 <div class="dashboard-grid">
-    <!-- Pending Approvals Card -->
+    
     <div class="dashboard-card full-width">
         <div class="card-header">
             <h2>
@@ -78,7 +78,7 @@ require_once __DIR__ . '/../../Lib/Security.php';
 </div>
 
 <style>
-    /* Mobile-First Table Styles */
+    
     .responsive-table-container { width: 100%; overflow-x: auto; }
     
     @media (max-width: 768px) {
