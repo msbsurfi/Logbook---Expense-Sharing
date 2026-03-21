@@ -65,11 +65,11 @@ class TransactionController {
                     if ($isLender) {
                         $mainMessage = "<strong>You lent</strong> money to <strong>{$safeName}</strong>.";
                         $subMessage = "You are currently owed this amount.";
-                        $color = "
+                        $color = "#28a745";
                     } else {
                         $mainMessage = "<strong>You borrowed</strong> money from <strong>{$safeName}</strong>.";
                         $subMessage = "You owe this amount to {$safeName}.";
-                        $color = "
+                        $color = "#dc3545";
                     }
 
                     $details = [
@@ -171,15 +171,15 @@ class TransactionController {
                         if ($isLender) {
                             $mainMessage = "Payment received from <strong>{$safeName}</strong>.";
                             $subMessage = "This debt has been marked as settled.";
-                            $color = "
+                            $color = "#28a745";
                         } else {
                             $mainMessage = "You paid <strong>{$safeName}</strong>.";
                             $subMessage = "You have settled this debt.";
-                            $color = "
+                            $color = "#007bff";
                         }
 
                         $details = [
-                            'Transaction ID' => '
+                            'Transaction ID' => '#' . $tid,
                             'Original Description' => htmlspecialchars($txn->description),
                             'Amount Settled' => '৳' . number_format($txn->amount, 2),
                             'Settled By' => htmlspecialchars($settler->name),

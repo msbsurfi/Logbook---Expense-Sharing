@@ -141,13 +141,13 @@ if (!$isLocked && $_SERVER['REQUEST_METHOD'] === 'POST') {
     <style>
         :root {
             color-scheme: light dark;
-            --bg: 
+            --bg: #0f0f10;
             --panel: rgba(22, 21, 19, 0.94);
             --panel-soft: rgba(255, 255, 255, 0.05);
-            --text: 
-            --muted: 
-            --brand: 
-            --danger: 
+            --text: #f8f5ef;
+            --muted: #cbbfae;
+            --brand: #d6a729;
+            --danger: #ff8c7d;
             --danger-bg: rgba(255, 140, 125, 0.14);
             --border: rgba(214, 167, 41, 0.18);
             --input: rgba(255, 255, 255, 0.06);
@@ -160,7 +160,7 @@ if (!$isLocked && $_SERVER['REQUEST_METHOD'] === 'POST') {
             color: var(--text);
             background:
                 radial-gradient(circle at top, rgba(214, 167, 41, 0.24), transparent 30%),
-                linear-gradient(180deg, 
+                linear-gradient(180deg, #1a1713, #0d0d0f 72%);
             min-height: 100vh;
         }
         a { color: inherit; }
@@ -267,8 +267,8 @@ if (!$isLocked && $_SERVER['REQUEST_METHOD'] === 'POST') {
             justify-content: center;
         }
         .btn-primary {
-            background: linear-gradient(135deg, 
-            color: 
+            background: linear-gradient(135deg, #d6a729, #bf8611);
+            color: #1a1408;
         }
         .btn-secondary {
             background: rgba(255, 255, 255, 0.06);

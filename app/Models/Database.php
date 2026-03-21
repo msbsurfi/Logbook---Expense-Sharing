@@ -41,7 +41,7 @@ class Database {
         try {
             return $this->stmt->execute();
         } catch (PDOException $e) {
-            
+            // Store clean message
             $this->lastError = $e->getMessage();
             return false;
         }

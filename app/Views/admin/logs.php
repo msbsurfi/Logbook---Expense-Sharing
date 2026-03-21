@@ -37,7 +37,7 @@ require_once __DIR__ . '/../layouts/header.php';
                         <?php
                           if ($a->meta) {
                               $decoded = json_decode($a->meta, true);
-                              
+                              // Pretty print JSON inside a scrollable div
                               echo '<div class="json-box">'.htmlspecialchars(json_encode($decoded)).'</div>';
                           } else {
                               echo '<span class="text-muted">-</span>';
@@ -53,7 +53,7 @@ require_once __DIR__ . '/../layouts/header.php';
         </table>
     </div>
 
-    
+    <!-- Simple Pagination -->
     <div class="pagination mt-4">
         <?php if($data['page'] > 1): ?>
             <a href="/admin/logs?page=<?php echo $data['page']-1; ?>" class="btn secondary">Previous</a>

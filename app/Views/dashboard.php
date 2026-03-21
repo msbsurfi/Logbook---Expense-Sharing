@@ -1,6 +1,6 @@
 <?php
 $title = 'Dashboard';
-require_once __DIR__ . '/layouts/header.php'; 
+require_once __DIR__ . '/layouts/header.php'; // Your new, modern header
 require_once __DIR__ . '/../Lib/Security.php';
 ?>
 
@@ -15,13 +15,13 @@ require_once __DIR__ . '/../Lib/Security.php';
     </div>
 </div>
 
-
+<!-- Summary Boxes -->
 <div class="summary-grid">
     <div class="summary-box">
         <div class="summary-icon danger"><i class="fa-solid fa-arrow-trend-down"></i></div>
         <div>
             <div class="summary-label">You Owe</div>
-            
+            <!-- Use the null coalescing operator (??) to provide a default value -->
             <div class="summary-value danger-text">৳<?php echo number_format($data['totalOwedByYou'] ?? 0, 2); ?></div>
         </div>
     </div>
@@ -34,9 +34,9 @@ require_once __DIR__ . '/../Lib/Security.php';
     </div>
 </div>
 
-
+<!-- Main Dashboard Layout -->
 <div class="dashboard-grid">
-    
+    <!-- Left Column: Main Actions -->
     <div class="main-column">
         <div class="dashboard-card">
             <div class="card-header">
@@ -52,7 +52,7 @@ require_once __DIR__ . '/../Lib/Security.php';
                         <i class="fa-solid fa-user-group"></i>
                         <select name="friend_id" id="friend_id" required>
                             <option value="">Select a friend...</option>
-                            
+                            <!-- Check if $data['friends'] exists and is not empty before looping -->
                             <?php if (!empty($data['friends'])) : ?>
                                 <?php foreach ($data['friends'] as $f) : ?>
                                     <option value="<?php echo $f->id; ?>"><?php echo htmlspecialchars($f->name); ?></option>
@@ -95,14 +95,14 @@ require_once __DIR__ . '/../Lib/Security.php';
         </div>
     </div>
 
-    
+    <!-- Right Column: Balances -->
     <div class="sidebar-column">
         <div class="dashboard-card">
             <div class="card-header">
                 <h2><i class="fa-solid fa-scale-balanced"></i> Balances</h2>
             </div>
             <div class="balances-list">
-                
+                <!-- Check if $data['balances'] is empty or doesn't exist -->
                 <?php if (empty($data['balances']) || !array_filter($data['balances'], fn($b) => $b['balance'] != 0)) : ?>
                     <div class="empty-state">
                         <i class="fa-solid fa-check-circle"></i>
@@ -135,9 +135,9 @@ require_once __DIR__ . '/../Lib/Security.php';
 </div>
 
 <style>
-    
+    /* --- DASHBOARD STYLES --- */
 
-    
+    /* --- Page Header --- */
     .dashboard-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
     .dashboard-header h1 { margin: 0 0 4px 0; color: var(--text-primary); }
     .dashboard-header .subtitle { color: var(--text-secondary); margin: 0; }
@@ -145,7 +145,7 @@ require_once __DIR__ . '/../Lib/Security.php';
     .profile-code-box span { font-size: 0.8rem; color: var(--text-secondary); }
     .profile-code-box strong { display: block; font-size: 1.1rem; color: var(--text-primary); }
 
-    
+    /* --- Summary Grid --- */
     .summary-grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 32px; }
     @media (min-width: 640px) { .summary-grid { grid-template-columns: repeat(2, 1fr); } }
     .summary-box { background-color: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 20px; display: flex; align-items: center; gap: 16px; }
@@ -157,17 +157,17 @@ require_once __DIR__ . '/../Lib/Security.php';
     .danger-text { color: var(--danger-color); }
     .success-text { color: var(--success-color); }
 
-    
+    /* --- Main Grid Layout --- */
     .dashboard-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
     @media (min-width: 1024px) { .dashboard-grid { grid-template-columns: 2fr 1fr; } }
 
-    
+    /* --- General Card Styling --- */
     .dashboard-card { background-color: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 24px; }
     .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
     .card-header h2 { margin: 0; font-size: 1.25rem; color: var(--text-primary); }
     .card-header .btn.secondary { padding: 8px 16px; font-size: 0.9rem; }
 
-    
+    /* --- Transaction Form --- */
     .transaction-form { display: flex; flex-direction: column; gap: 20px; }
     .form-group label { display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-primary); }
     .input-with-icon { position: relative; }
@@ -183,7 +183,7 @@ require_once __DIR__ . '/../Lib/Security.php';
     .sg-btn { flex: 1; padding: 10px; border: none; background-color: transparent; border-radius: 6px; font-weight: 500; cursor: pointer; transition: background-color 0.2s, color 0.2s; color: var(--text-secondary); }
     .sg-btn.active { background-color: var(--card-bg); color: var(--brand-color); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
     
-    
+    /* --- THE NEW BUTTON STYLE --- */
     .btn-primary {
         background-color: var(--brand-color);
         color: white;
@@ -205,13 +205,13 @@ require_once __DIR__ . '/../Lib/Security.php';
         transform: translateY(-2px);
     }
     .btn-primary:disabled {
-        background-color: 
+        background-color: #ccc;
         cursor: not-allowed;
         box-shadow: none;
         transform: none;
     }
 
-    
+    /* --- Balances List --- */
     .balances-list table { width: 100%; border-collapse: collapse; }
     .balances-list td { padding: 12px 0; border-bottom: 1px solid var(--card-border); }
     .balances-list tr:last-child td { border-bottom: none; }
@@ -237,7 +237,7 @@ require_once __DIR__ . '/../Lib/Security.php';
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    
+    // --- Segmented Control for Transaction Form ---
     const segmentedControl = document.querySelector('.segmented-control');
     const hiddenInput = document.getElementById('i_owe_them_input');
 
@@ -255,4 +255,4 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-<?php require_once __DIR__ . '/layouts/footer.php'; 
+<?php require_once __DIR__ . '/layouts/footer.php'; // Your new, modern footer ?>

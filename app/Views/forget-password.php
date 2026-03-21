@@ -10,26 +10,26 @@ $logoVersion = (string) (
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="
+  <meta name="theme-color" content="#b8860b">
   <link rel="icon" type="image/png" href="/favicon.png?v=<?php echo rawurlencode($logoVersion); ?>">
   <link rel="shortcut icon" href="/favicon.png?v=<?php echo rawurlencode($logoVersion); ?>">
   <link rel="apple-touch-icon" href="/logo.png?v=<?php echo rawurlencode($logoVersion); ?>">
   <title>Forgot Password - Logbook</title>
-  <link rel="stylesheet" href="https:
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer">
   <style>
     :root {
-      --brand: 
-      --brand-dark: 
-      --bg: 
+      --brand: #b8860b;
+      --brand-dark: #906707;
+      --bg: #f6f1e6;
       --card: rgba(255, 251, 245, 0.98);
-      --text: 
-      --muted: 
+      --text: #1f1b16;
+      --muted: #6b5f51;
       --border: rgba(97, 74, 28, 0.16);
-      --input: 
+      --input: #fff9ef;
       --success-bg: rgba(20, 125, 82, 0.12);
-      --success-text: 
+      --success-text: #0c5c3b;
       --danger-bg: rgba(194, 65, 53, 0.12);
-      --danger-text: 
+      --danger-text: #8d2d24;
       --shadow: 0 24px 50px rgba(35, 27, 15, 0.12);
     }
 
@@ -131,7 +131,7 @@ $logoVersion = (string) (
       border: none;
       border-radius: 999px;
       background: linear-gradient(135deg, var(--brand), var(--brand-dark));
-      color: 
+      color: #fff;
       padding: 14px 18px;
       font-weight: 700;
       font-size: 1rem;

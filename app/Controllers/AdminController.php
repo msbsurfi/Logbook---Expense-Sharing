@@ -291,7 +291,7 @@ class AdminController {
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment; filename="users_export_'.date('Y-m-d').'.csv"');
         
-        $out = fopen('php:
+        $out = fopen('php://output', 'w');
         fputcsv($out, ['ID', 'Name', 'Email', 'Role', 'Status', 'Registered At']);
         
         foreach($users as $u){
@@ -330,7 +330,7 @@ class AdminController {
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment; filename="transactions_export_'.date('Y-m-d').'.csv"');
         
-        $out = fopen('php:
+        $out = fopen('php://output', 'w');
         fputcsv($out, ['ID', 'Lender', 'Borrower', 'Amount', 'Description', 'Status', 'Date']);
         
         foreach($rows as $r){
@@ -357,7 +357,7 @@ class AdminController {
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment; filename="expenses_export_'.date('Y-m-d').'.csv"');
         
-        $out = fopen('php:
+        $out = fopen('php://output', 'w');
         fputcsv($out, ['ID', 'Description', 'Total Amount', 'Creator', 'Date']);
         
         foreach($rows as $r){

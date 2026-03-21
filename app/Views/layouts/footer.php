@@ -84,7 +84,7 @@ foreach ($toastMap as $sessionKey => [$type, $title]) {
         </div>
         <div class="footer-credit">
             <small>&copy; <?php echo date('Y'); ?> Logbook.</small>
-            <a href="https:
+            <a href="https://msbsu.com" target="_blank" rel="noopener" class="developer-link" id="developer-link">
                 <span>Developed by Murdered Soul</span>
                 <strong>msbsu.com</strong>
             </a>
@@ -109,7 +109,7 @@ foreach ($toastMap as $sessionKey => [$type, $title]) {
             burst.style.left = (rect.left + (rect.width / 2)) + 'px';
             burst.style.top = (rect.top + (rect.height / 2)) + 'px';
 
-            var colors = ['
+            var colors = ['#b8860b', '#f59e0b', '#ef4444', '#0ea5e9', '#22c55e'];
             for (var i = 0; i < 18; i++) {
                 var piece = document.createElement('span');
                 piece.className = 'developer-burst-piece';

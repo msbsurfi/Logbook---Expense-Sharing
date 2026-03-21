@@ -117,9 +117,9 @@ class UserController {
         }
 
         $verifyUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']==='on' ? 'https' : 'http')
-                   . ':
+                   . '://'.$_SERVER['HTTP_HOST'].'/verify?token='.$verificationToken;
 
-        $verifyBtn = "<div style='text-align:center;margin:24px 0;'><a href='{$verifyUrl}' style='background-color:
+        $verifyBtn = "<div style='text-align:center;margin:24px 0;'><a href='{$verifyUrl}' style='background-color:#C9A227;color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:700;font-size:16px;display:inline-block;'>Verify My Email</a></div>";
         $html = EmailTemplate::generate(
             'Verify Your Logbook Account',
             $name,
@@ -204,9 +204,9 @@ class UserController {
         }
 
         $verifyUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']==='on' ? 'https' : 'http')
-                   . ':
+                   . '://'.$_SERVER['HTTP_HOST'].'/verify?token='.$newToken;
 
-        $verifyBtn = "<div style='text-align:center;margin:24px 0;'><a href='{$verifyUrl}' style='background-color:
+        $verifyBtn = "<div style='text-align:center;margin:24px 0;'><a href='{$verifyUrl}' style='background-color:#C9A227;color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:700;font-size:16px;display:inline-block;'>Verify My Email</a></div>";
         $html = EmailTemplate::generate(
             'Email Verification Link',
             $user->name,
@@ -299,9 +299,9 @@ class UserController {
             }
 
             $resetUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']==='on' ? 'https' : 'http')
-                . ':
+                . '://' . $_SERVER['HTTP_HOST'] . '/reset-password?token=' . urlencode($token);
 
-            $resetBtn = "<div style='text-align:center;margin:24px 0;'><a href='{$resetUrl}' style='background-color:
+            $resetBtn = "<div style='text-align:center;margin:24px 0;'><a href='{$resetUrl}' style='background-color:#b8860b;color:#fff;padding:14px 32px;border-radius:999px;text-decoration:none;font-weight:700;font-size:16px;display:inline-block;'>Reset My Password</a></div>";
             $html = EmailTemplate::generate(
                 'Reset Your Logbook Password',
                 $user->name,

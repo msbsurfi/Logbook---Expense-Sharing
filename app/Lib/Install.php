@@ -192,7 +192,7 @@ class Install {
 
         foreach ($lines as $line) {
             $trimmed = ltrim($line);
-            if ($trimmed === '' || str_starts_with($trimmed, '--') || str_starts_with($trimmed, '
+            if ($trimmed === '' || str_starts_with($trimmed, '--') || str_starts_with($trimmed, '#')) {
                 continue;
             }
             $filteredLines[] = $line;

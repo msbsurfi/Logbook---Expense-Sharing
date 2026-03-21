@@ -4,7 +4,7 @@ require_once __DIR__ . '/../layouts/header.php';
 require_once __DIR__ . '/../../Lib/Security.php';
 require_once __DIR__ . '/../../Lib/Install.php';
 
-
+// Helper for URL generation
 function url($tab, $params = []) {
     $query = array_merge(['tab' => $tab], $params);
     return '/admin?' . http_build_query($query);
@@ -397,26 +397,26 @@ $activeTab = $data['tab'] ?? 'dashboard';
 </div>
 
 <style>
-    
+    /* Tabs */
     .admin-tabs { display: flex; gap: 10px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 4px; border-bottom: 1px solid var(--card-border); }
     .tab-link { padding: 10px 20px; border-radius: 8px 8px 0 0; background: var(--input-bg); color: var(--text-secondary); text-decoration: none; font-weight: 500; transition: all 0.2s; white-space: nowrap; }
     .tab-link:hover { color: var(--text-primary); background: var(--card-bg); }
     .tab-link.active { background: var(--brand-color); color: white; }
 
-    
+    /* Layouts */
     .dashboard-grid { display: flex; flex-direction: column; gap: 24px; }
     .split-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
     @media (min-width: 1024px) { .split-grid { grid-template-columns: 3fr 1fr; } }
 
-    
+    /* Stats */
     .stats-overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px; }
     .stat-card { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--card-border); display: flex; align-items: center; gap: 16px; }
     .stat-icon { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; }
-    .bg-blue { background: 
+    .bg-blue { background: #3b82f6; } .bg-green { background: #10b981; } .bg-purple { background: #8b5cf6; }
     .stat-info h3 { margin: 0; font-size: 1.5rem; color: var(--text-primary); }
     .stat-info span { color: var(--text-secondary); font-size: 0.9rem; }
 
-    
+    /* Tables Mobile First */
     .responsive-table-container { overflow-x: auto; }
     .admin-table { width: 100%; border-collapse: collapse; }
     .admin-table th { text-align: left; padding: 12px; border-bottom: 2px solid var(--card-border); color: var(--text-secondary); }
@@ -430,7 +430,7 @@ $activeTab = $data['tab'] ?? 'dashboard';
         .admin-table.mobile-stack td.text-right { text-align: right; justify-content: flex-end; }
     }
 
-    
+    /* Actions & Avatars */
     .user-cell { display: flex; align-items: center; gap: 10px; }
     .avatar { width: 32px; height: 32px; background: var(--brand-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; }
     .action-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -439,16 +439,16 @@ $activeTab = $data['tab'] ?? 'dashboard';
     .btn-icon { background: none; border: none; cursor: pointer; font-size: 1rem; color: var(--text-secondary); padding: 4px; transition: transform 0.2s; }
     .btn-icon:hover { transform: scale(1.1); }
     .text-success { color: var(--success-color); } .text-danger { color: var(--danger-color); } 
-    .text-primary { color: var(--brand-color); } .text-warning { color: 
+    .text-primary { color: var(--brand-color); } .text-warning { color: #f59e0b; }
 
-    
+    /* Badges & Misc */
     .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
-    .role-admin { background: 
-    .status-active { background: 
+    .role-admin { background: #dbeafe; color: #1e40af; } .role-user { background: #f3f4f6; color: #374151; }
+    .status-active { background: #d1fae5; color: #065f46; } .status-pending { background: #fef3c7; color: #92400e; } .status-suspended { background: #fee2e2; color: #b91c1c; }
     .badge-log { font-family: monospace; background: var(--input-bg); padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; }
     .json-box { font-family: monospace; font-size: 0.75rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
     
-    
+    /* Sidebar Forms */
     .sidebar-form input, .sidebar-form select { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 6px; border: 1px solid var(--card-border); background: var(--input-bg); color: var(--text-primary); }
     .full-width { width: 100%; margin-bottom: 8px; }
     .mb-2 { margin-bottom: 8px; }
@@ -487,7 +487,7 @@ $activeTab = $data['tab'] ?? 'dashboard';
 </style>
 
 <?php if ($activeTab === 'dashboard'): ?>
-<script src="https:
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     fetch('/admin/analytics-data')
         .then(r => r.json())
@@ -501,7 +501,7 @@ $activeTab = $data['tab'] ?? 'dashboard';
                     datasets: [{
                         label: 'Transactions',
                         data: data.counts,
-                        borderColor: '
+                        borderColor: '#3b82f6',
                         backgroundColor: 'rgba(59, 130, 246, 0.1)',
                         fill: true,
                         tension: 0.4

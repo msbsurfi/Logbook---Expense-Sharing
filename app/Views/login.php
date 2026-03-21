@@ -10,30 +10,30 @@ $logoVersion = (string) (
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="
+  <meta name="theme-color" content="#b8860b">
   <link rel="icon" type="image/png" href="/favicon.png?v=<?php echo rawurlencode($logoVersion); ?>">
   <link rel="shortcut icon" href="/favicon.png?v=<?php echo rawurlencode($logoVersion); ?>">
   <link rel="apple-touch-icon" href="/logo.png?v=<?php echo rawurlencode($logoVersion); ?>">
   <title>Login - Logbook</title>
   
-  <link rel="stylesheet" href="https:
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer">
 
   <style>
-    
+    /* --- CSS STYLES --- */
 
-    
+    /* --- Global Styles & Variables --- */
     :root {
-      --primary-color: 
-      --primary-hover: 
-      --background-color: 
+      --primary-color: #b8860b;
+      --primary-hover: #906707;
+      --background-color: #f6f1e6;
       --card-background: rgba(255, 251, 245, 0.98);
-      --text-color: 
-      --subtext-color: 
+      --text-color: #1f1b16;
+      --subtext-color: #6b5f51;
       --border-color: rgba(97, 74, 28, 0.16);
       --success-bg: rgba(20, 125, 82, 0.12);
-      --success-color: 
+      --success-color: #0c5c3b;
       --error-bg: rgba(194, 65, 53, 0.12);
-      --error-color: 
+      --error-color: #8d2d24;
     }
 
     body {
@@ -49,7 +49,7 @@ $logoVersion = (string) (
       min-height: 100vh;
     }
 
-    
+    /* --- Main Container & Card --- */
     .login-container {
       max-width: 420px;
       width: 100%;
@@ -102,7 +102,7 @@ $logoVersion = (string) (
       margin: 0 0 30px;
     }
 
-    
+    /* --- Alerts --- */
     .alert {
       display: flex;
       align-items: center;
@@ -124,7 +124,7 @@ $logoVersion = (string) (
       color: var(--success-color);
     }
 
-    
+    /* --- Form Elements --- */
     .login-form {
       display: flex;
       flex-direction: column;
@@ -140,17 +140,17 @@ $logoVersion = (string) (
       top: 50%;
       left: 15px;
       transform: translateY(-50%);
-      color: 
+      color: #aaa;
     }
 
     .form-group input {
       width: 100%;
-      padding: 14px 14px 14px 45px; 
+      padding: 14px 14px 14px 45px; /* Left padding for icon */
       border: 1px solid var(--border-color);
       border-radius: 8px;
       font-size: 1rem;
       transition: border-color 0.2s, box-shadow 0.2s;
-      box-sizing: border-box; 
+      box-sizing: border-box; /* Important for padding */
     }
 
     .form-group input:focus {
@@ -164,11 +164,11 @@ $logoVersion = (string) (
       top: 50%;
       right: 15px;
       transform: translateY(-50%);
-      color: 
+      color: #aaa;
       cursor: pointer;
     }
 
-    
+    /* --- Button --- */
     .btn {
       background-color: var(--primary-color);
       color: white;
@@ -187,11 +187,11 @@ $logoVersion = (string) (
     }
     
     .btn.disable-on-click:disabled {
-        background-color: 
+        background-color: #ccc;
         cursor: not-allowed;
     }
 
-    
+    /* --- Links --- */
     .links-container {
       display: flex;
       justify-content: space-between;
@@ -214,7 +214,7 @@ $logoVersion = (string) (
       font-size: 0.9rem;
     }
 
-    
+    /* --- Modal Styles --- */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -260,7 +260,7 @@ $logoVersion = (string) (
       background: none;
       border: none;
       font-size: 2rem;
-      color: 
+      color: #aaa;
       cursor: pointer;
     }
 
@@ -313,7 +313,7 @@ $logoVersion = (string) (
 
     <div class="links-container">
       <a href="/forgot-password">Forgot Password?</a>
-      <a href="
+      <a href="#" id="resendVerificationLink">Resend Verification</a>
     </div>
 
     <p class="footer-link">
@@ -322,7 +322,7 @@ $logoVersion = (string) (
   </div>
 </div>
 
-
+<!-- Resend Verification Modal -->
 <div class="modal-overlay" id="resendModal">
   <div class="modal-content">
     <button class="close-modal" id="closeModal">&times;</button>
@@ -340,31 +340,31 @@ $logoVersion = (string) (
 </div>
 
 <script>
-  
+  // --- JAVASCRIPT LOGIC ---
   document.addEventListener('DOMContentLoaded', () => {
 
-    
-    const togglePassword = document.querySelector('
-    const password = document.querySelector('
+    // --- Password Toggle Functionality ---
+    const togglePassword = document.querySelector('#togglePassword');
+    const password = document.querySelector('#password');
 
     if (togglePassword && password) {
       togglePassword.addEventListener('click', function () {
-        
+        // Toggle the type attribute
         const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
         password.setAttribute('type', type);
-        
+        // Toggle the icon
         this.classList.toggle('fa-eye');
         this.classList.toggle('fa-eye-slash');
       });
     }
 
-    
+    // --- Disable Button on Form Submit ---
     const forms = document.querySelectorAll('form');
     forms.forEach(form => {
         form.addEventListener('submit', function(e) {
             const submitButton = form.querySelector('.disable-on-click');
             if (submitButton) {
-                
+                // Small delay to ensure form data is captured before disabling
                 setTimeout(() => {
                     submitButton.disabled = true;
                     submitButton.textContent = 'Processing...';
@@ -373,18 +373,18 @@ $logoVersion = (string) (
         });
     });
 
-    
+    // --- Resend Verification Modal Functionality ---
     const resendModal = document.getElementById('resendModal');
     const resendLink = document.getElementById('resendVerificationLink');
     const closeModal = document.getElementById('closeModal');
     const modalEmailInput = resendModal.querySelector('input[name="email"]');
 
     if (resendModal && resendLink && closeModal) {
-      
+      // Function to open the modal
       const openModal = (e) => {
         e.preventDefault();
         
-        
+        // Pre-fill email from main form if it exists
         const mainEmailValue = document.querySelector('.login-form input[name="email"]').value;
         if (mainEmailValue) {
             modalEmailInput.value = mainEmailValue;
@@ -394,23 +394,23 @@ $logoVersion = (string) (
         modalEmailInput.focus();
       };
 
-      
+      // Function to close the modal
       const closeModalFunc = () => {
         resendModal.classList.remove('active');
       };
 
-      
+      // Event listeners
       resendLink.addEventListener('click', openModal);
       closeModal.addEventListener('click', closeModalFunc);
 
-      
+      // Close modal if user clicks outside of the modal content
       resendModal.addEventListener('click', (e) => {
         if (e.target === resendModal) {
           closeModalFunc();
         }
       });
 
-      
+      // Close modal with the Escape key
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && resendModal.classList.contains('active')) {
           closeModalFunc();

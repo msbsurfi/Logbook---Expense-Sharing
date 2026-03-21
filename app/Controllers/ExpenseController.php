@@ -258,15 +258,15 @@ class ExpenseController {
             $myNet     = $myPaid - $myShare;
 
             if ($myNet > 0) {
-                $themeColor = '
+                $themeColor = '#C9A227';
                 $mainMsg    = "You paid <strong>৳" . number_format($myPaid, 2) . "</strong> for <em>{$description}</em>.";
                 $subMsg     = "Others owe you a total of <strong>৳" . number_format($myNet, 2) . "</strong>.";
             } elseif ($myNet < 0) {
-                $themeColor = '
+                $themeColor = '#dc3545';
                 $mainMsg    = "You owe <strong>৳" . number_format(abs($myNet), 2) . "</strong> for <em>{$description}</em>.";
                 $subMsg     = "Please settle your share with the payer(s) at your earliest convenience.";
             } else {
-                $themeColor = '
+                $themeColor = '#6c757d';
                 $mainMsg    = "You are settled for <em>{$description}</em>.";
                 $subMsg     = "Your contribution exactly covered your share. No further action needed.";
             }
@@ -373,7 +373,7 @@ class ExpenseController {
                     "You were added as friends with <strong>{$safeOtherName}</strong>.",
                     'This connection was created automatically from a shared group expense so you can settle balances when needed.',
                     $details,
-                    '
+                    '#0d6efd'
                 );
 
                 $subject = 'You are now friends with ' . $otherUser->name;

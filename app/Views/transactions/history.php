@@ -1,6 +1,6 @@
 <?php
 $title = 'Transaction History';
-require_once __DIR__ . '/../layouts/header.php'; 
+require_once __DIR__ . '/../layouts/header.php'; // Your modern, theme-aware header
 ?>
 
 <div class="page-header">
@@ -19,7 +19,7 @@ require_once __DIR__ . '/../layouts/header.php';
         </div>
     </div>
     
-    
+    <!-- This wrapper enables horizontal scrolling on mobile -->
     <div class="table-wrapper">
         <table id="history-table" class="history-table" style="width:100%">
             <thead>
@@ -76,15 +76,15 @@ require_once __DIR__ . '/../layouts/header.php';
 </div>
 
 <style>
-    
+    /* Use variables from the global theme */
     :root {
-        --warning-bg: 
-        --warning-text: 
-        --warning-border: 
+        --warning-bg: #fef9c3;
+        --warning-text: #854d0e;
+        --warning-border: #facc15;
     }
     [data-theme="dark"] {
-        --warning-bg: 
-        --warning-text: 
+        --warning-bg: #42310b;
+        --warning-text: #fef08a;
     }
 
     .page-header h1 { margin: 0 0 4px 0; color: var(--text-primary); }
@@ -95,27 +95,27 @@ require_once __DIR__ . '/../layouts/header.php';
     .card-header h2 { margin: 0; font-size: 1.25rem; color: var(--text-primary); }
     .search-bar .input-with-icon { position: relative; }
     .search-bar i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); }
-    
+    #history-search-input {
         width: 100%; min-width: 250px; padding: 10px 10px 10px 40px; border: 1px solid var(--card-border); border-radius: 8px; font-size: 0.95rem;
         background-color: var(--input-bg); color: var(--text-primary);
     }
     
-    
+    /* Styles for Horizontal Scrolling Table */
     .table-wrapper {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
     }
-    
-    
+    #history-table { border-collapse: collapse !important; }
+    #history-table thead th {
         color: var(--text-secondary); text-align: left; white-space: nowrap;
         user-select: none;
     }
-    
+    #history-table tbody td {
         color: var(--text-primary); padding: 12px 16px !important; border-top: 1px solid var(--card-border);
         white-space: nowrap;
     }
 
-    
+    /* Badge Styles */
     .badge { padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; white-space: nowrap; }
     .badge.status-paid { background-color: var(--success-bg); color: var(--success-text); }
     .badge.status-unpaid { background-color: var(--warning-bg); color: var(--warning-text); }
@@ -131,7 +131,7 @@ require_once __DIR__ . '/../layouts/header.php';
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('history-search-input');
-    const rows = Array.from(document.querySelectorAll('
+    const rows = Array.from(document.querySelectorAll('#history-table tbody tr'));
 
     if (!searchInput || rows.length === 0) {
         return;
