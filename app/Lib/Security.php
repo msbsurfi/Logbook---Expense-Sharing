@@ -13,11 +13,7 @@ class Security {
     public static function validateCsrf($token){
         self::ensureSession();
         if (empty($token) || empty($_SESSION['csrf_token'])) return false;
-        $valid = hash_equals($_SESSION['csrf_token'], $token);
-        if ($valid){
-            $_SESSION['csrf_token'] = bin2hex(random_bytes(32)); // rotate
-        }
-        return $valid;
+        return hash_equals($_SESSION['csrf_token'], $token);
     }
     public static function csrfField(){
         return '<input type="hidden" name="csrf_token" value="'.htmlspecialchars(self::csrfToken()).'">';

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="/logo.png">
-  <title>Forgot Password - Logbook</title>
+  <title>Reset Password - Logbook</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer">
   <style>
     :root {
@@ -38,10 +38,7 @@
       font-family: "Segoe UI", "Trebuchet MS", system-ui, sans-serif;
     }
 
-    .auth-shell {
-      width: min(100%, 440px);
-    }
-
+    .auth-shell { width: min(100%, 440px); }
     .auth-card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -77,10 +74,18 @@
     }
 
     .alert.error { background: var(--danger-bg); color: var(--danger-text); }
-    .alert.success { background: var(--success-bg); color: var(--success-text); }
 
-    .form-group { position: relative; margin-bottom: 16px; }
-    .form-group i {
+    .field { margin-bottom: 16px; }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .input-wrap { position: relative; }
+    .input-wrap i {
       position: absolute;
       top: 50%;
       left: 14px;
@@ -118,15 +123,13 @@
 
     .btn:disabled { opacity: 0.7; cursor: not-allowed; }
 
-    .links {
+    .helper {
       margin-top: 18px;
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
+      color: var(--muted);
       font-size: 0.92rem;
     }
 
-    .links a {
+    .helper a {
       color: var(--brand-dark);
       text-decoration: none;
       font-weight: 600;
@@ -137,8 +140,8 @@
   <div class="auth-shell">
     <div class="auth-card">
       <div class="logo">L</div>
-      <h1>Reset your password</h1>
-      <p class="subtitle">Enter your account email and we’ll send you a reset link if the account exists.</p>
+      <h1>Create a new password</h1>
+      <p class="subtitle">Set a new password for <?php echo htmlspecialchars($data['name'] ?? 'your account'); ?>.</p>
 
       <?php if (!empty($_SESSION['flash_error'])): ?>
         <div class="alert error">
@@ -147,26 +150,30 @@
         </div>
       <?php endif; ?>
 
-      <?php if (!empty($_SESSION['flash_success'])): ?>
-        <div class="alert success">
-          <i class="fa-solid fa-circle-check"></i>
-          <span><?php echo htmlspecialchars($_SESSION['flash_success']); unset($_SESSION['flash_success']); ?></span>
-        </div>
-      <?php endif; ?>
-
-      <form action="/forgot-password" method="post">
+      <form action="/reset-password" method="post">
         <?php echo Security::csrfField(); ?>
-        <div class="form-group">
-          <i class="fa-solid fa-envelope"></i>
-          <input type="email" name="email" placeholder="Email address" required>
+        <input type="hidden" name="token" value="<?php echo htmlspecialchars($data['token'] ?? '', ENT_QUOTES); ?>">
+
+        <div class="field">
+          <label for="password">New password</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-lock"></i>
+            <input type="password" id="password" name="password" minlength="8" autocomplete="new-password" required>
+          </div>
         </div>
-        <button class="btn disable-on-click" type="submit">Send Reset Link</button>
+
+        <div class="field">
+          <label for="password_confirmation">Confirm password</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-check-double"></i>
+            <input type="password" id="password_confirmation" name="password_confirmation" minlength="8" autocomplete="new-password" required>
+          </div>
+        </div>
+
+        <button class="btn disable-on-click" type="submit">Update Password</button>
       </form>
 
-      <div class="links">
-        <a href="/login"><i class="fa-solid fa-arrow-left"></i> Back to login</a>
-        <a href="/register">Create account</a>
-      </div>
+      <p class="helper">Remembered it? <a href="/login">Back to login</a></p>
     </div>
   </div>
 
@@ -177,7 +184,7 @@
       if (!button) return;
       setTimeout(() => {
         button.disabled = true;
-        button.textContent = 'Sending link...';
+        button.textContent = 'Updating password...';
       }, 10);
     }, true);
   </script>

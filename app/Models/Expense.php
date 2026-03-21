@@ -1,7 +1,7 @@
 <?php
 class Expense {
     private $db;
-    public function __construct(){ $this->db = new Database; }
+    public function __construct(?Database $db = null){ $this->db = $db ?? new Database; }
 
     public function createExpense($description,$totalAmount,$creatorId){
         $this->db->query('INSERT INTO expenses (description,total_amount,created_by_user_id) VALUES (:d,:t,:c)');

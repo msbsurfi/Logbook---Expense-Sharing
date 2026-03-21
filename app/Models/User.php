@@ -19,7 +19,7 @@ class User {
     }
 
     public function findUserByProfileCode(string $profileCode){
-        $this->db->query('SELECT id,name,email,profile_code FROM users WHERE profile_code=:c LIMIT 1');
+        $this->db->query('SELECT id,name,email,profile_code,status,email_verified,banned_at,rejected_at FROM users WHERE profile_code=:c LIMIT 1');
         $this->db->bind(':c',$profileCode);
         return $this->db->fetchOne();
     }
@@ -27,6 +27,22 @@ class User {
     public function findByVerificationToken(string $token){
         $this->db->query('SELECT * FROM users WHERE verification_token=:t LIMIT 1');
         $this->db->bind(':t',$token);
+        return $this->db->fetchOne();
+    }
+
+    public function findPasswordResetByTokenHash(string $tokenHash){
+        if (!$this->ensurePasswordResetTable()) {
+            return null;
+        }
+
+        $this->db->query('
+            SELECT pr.email, pr.expires_at, u.id, u.name
+            FROM password_resets pr
+            JOIN users u ON u.email = pr.email
+            WHERE pr.token_hash = :token AND pr.expires_at >= NOW()
+            LIMIT 1
+        ');
+        $this->db->bind(':token', $tokenHash);
         return $this->db->fetchOne();
     }
 
@@ -174,11 +190,17 @@ class User {
     public function countFilteredUsers(array $filters): int {
         $sql = "SELECT COUNT(*) AS c FROM users WHERE 1=1";
         if ($filters['role'])   $sql .= " AND role = :role";
-        if ($filters['status']) $sql .= " AND status = :status";
+        if ($filters['status'] === 'suspended') {
+            $sql .= " AND banned_at IS NOT NULL";
+        } elseif ($filters['status']) {
+            $sql .= " AND status = :status";
+        }
         if ($filters['search']) $sql .= " AND (email LIKE :search OR name LIKE :search)";
         $this->db->query($sql);
         if ($filters['role'])   $this->db->bind(':role',$filters['role']);
-        if ($filters['status']) $this->db->bind(':status',$filters['status']);
+        if ($filters['status'] && $filters['status'] !== 'suspended') {
+            $this->db->bind(':status',$filters['status']);
+        }
         if ($filters['search']) $this->db->bind(':search','%'.$filters['search'].'%');
         $row = $this->db->fetchOne();
         return $row ? (int)$row->c : 0;
@@ -190,15 +212,69 @@ class User {
                        rejected_at,rejection_reason,created_at,verification_resend_count,last_verification_resend_at
                 FROM users WHERE 1=1";
         if ($filters['role'])   $sql .= " AND role = :role";
-        if ($filters['status']) $sql .= " AND status = :status";
+        if ($filters['status'] === 'suspended') {
+            $sql .= " AND banned_at IS NOT NULL";
+        } elseif ($filters['status']) {
+            $sql .= " AND status = :status";
+        }
         if ($filters['search']) $sql .= " AND (email LIKE :search OR name LIKE :search)";
         $sql .= " ORDER BY created_at DESC LIMIT :offset,:limit";
         $this->db->query($sql);
         if ($filters['role'])   $this->db->bind(':role',$filters['role']);
-        if ($filters['status']) $this->db->bind(':status',$filters['status']);
+        if ($filters['status'] && $filters['status'] !== 'suspended') {
+            $this->db->bind(':status',$filters['status']);
+        }
         if ($filters['search']) $this->db->bind(':search','%'.$filters['search'].'%');
         $this->db->bind(':offset',(int)$offset, PDO::PARAM_INT);
         $this->db->bind(':limit',(int)$perPage, PDO::PARAM_INT);
         return $this->db->fetchAll();
+    }
+
+    public function createPasswordReset(string $email, string $tokenHash, string $expiresAt): bool {
+        if (!$this->ensurePasswordResetTable()) {
+            return false;
+        }
+
+        $this->db->query('DELETE FROM password_resets WHERE email = :email');
+        $this->db->bind(':email', $email);
+        $this->db->execute();
+
+        $this->db->query('INSERT INTO password_resets (email, token_hash, expires_at) VALUES (:email, :token, :expires_at)');
+        $this->db->bind(':email', $email);
+        $this->db->bind(':token', $tokenHash);
+        $this->db->bind(':expires_at', $expiresAt);
+        return $this->db->execute();
+    }
+
+    public function updatePasswordByEmail(string $email, string $passwordHash): bool {
+        $this->db->query('UPDATE users SET password = :password WHERE email = :email');
+        $this->db->bind(':password', $passwordHash);
+        $this->db->bind(':email', $email);
+        return $this->db->execute();
+    }
+
+    public function deletePasswordReset(string $tokenHash): bool {
+        if (!$this->ensurePasswordResetTable()) {
+            return false;
+        }
+
+        $this->db->query('DELETE FROM password_resets WHERE token_hash = :token');
+        $this->db->bind(':token', $tokenHash);
+        return $this->db->execute();
+    }
+
+    private function ensurePasswordResetTable(): bool {
+        $this->db->query('
+            CREATE TABLE IF NOT EXISTS password_resets (
+                id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                email VARCHAR(255) NOT NULL,
+                token_hash CHAR(64) NOT NULL,
+                expires_at DATETIME NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE KEY uniq_password_reset_email (email),
+                UNIQUE KEY uniq_password_reset_token (token_hash)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        ');
+        return $this->db->execute();
     }
 }

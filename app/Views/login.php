@@ -14,22 +14,24 @@
 
     /* --- Global Styles & Variables --- */
     :root {
-      --primary-color: #007bff;
-      --primary-hover: #0056b3;
-      --background-color: #f4f7f6;
-      --card-background: #ffffff;
-      --text-color: #333;
-      --subtext-color: #666;
-      --border-color: #ddd;
-      --success-bg: #e9f7ef;
-      --success-color: #1e7e34;
-      --error-bg: #fdecea;
-      --error-color: #d93025;
+      --primary-color: #b8860b;
+      --primary-hover: #906707;
+      --background-color: #f6f1e6;
+      --card-background: rgba(255, 251, 245, 0.98);
+      --text-color: #1f1b16;
+      --subtext-color: #6b5f51;
+      --border-color: rgba(97, 74, 28, 0.16);
+      --success-bg: rgba(20, 125, 82, 0.12);
+      --success-color: #0c5c3b;
+      --error-bg: rgba(194, 65, 53, 0.12);
+      --error-color: #8d2d24;
     }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background-color: var(--background-color);
+      background:
+        radial-gradient(circle at top left, rgba(184, 134, 11, 0.12), transparent 30%),
+        var(--background-color);
       color: var(--text-color);
       margin: 0;
       display: flex;
@@ -47,9 +49,10 @@
 
     .login-card {
       background-color: var(--card-background);
+      border: 1px solid var(--border-color);
       padding: 40px;
       border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 24px 50px rgba(35, 27, 15, 0.12);
       text-align: center;
     }
 

@@ -37,6 +37,16 @@ switch($parts[0]){
         $c = new UserController();
         if ($_SERVER['REQUEST_METHOD']==='POST') $c->resendVerification(); else require_once __DIR__ . '/../app/Views/resend_verification.php';
         break;
+
+    case 'forgot-password':
+        $c = new UserController();
+        if ($_SERVER['REQUEST_METHOD']==='POST') $c->sendPasswordReset(); else $c->showForgotPasswordForm();
+        break;
+
+    case 'reset-password':
+        $c = new UserController();
+        if ($_SERVER['REQUEST_METHOD']==='POST') $c->resetPassword(); else $c->showResetPasswordForm();
+        break;
         
     case 'login':
         $c = new UserController();

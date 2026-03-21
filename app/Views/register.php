@@ -14,18 +14,20 @@
 
     /* --- Global Styles & Variables (Consistent with Login Page) --- */
     :root {
-      --primary-color: #007bff;
-      --primary-hover: #0056b3;
-      --background-color: #f4f7f6;
-      --card-background: #ffffff;
-      --text-color: #333;
-      --subtext-color: #666;
-      --border-color: #ddd;
+      --primary-color: #b8860b;
+      --primary-hover: #906707;
+      --background-color: #f6f1e6;
+      --card-background: rgba(255, 251, 245, 0.98);
+      --text-color: #1f1b16;
+      --subtext-color: #6b5f51;
+      --border-color: rgba(97, 74, 28, 0.16);
     }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background-color: var(--background-color);
+      background:
+        radial-gradient(circle at top left, rgba(184, 134, 11, 0.12), transparent 30%),
+        var(--background-color);
       color: var(--text-color);
       margin: 0;
       padding: 20px 0; /* Add padding for scroll on small screens */
@@ -44,9 +46,10 @@
 
     .register-card {
       background-color: var(--card-background);
+      border: 1px solid var(--border-color);
       padding: 40px;
       border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 24px 50px rgba(35, 27, 15, 0.12);
       text-align: center;
     }
 
@@ -234,6 +237,20 @@
     <p class="subtitle">Join LogBook today. It's free and always will be.</p>
 
     <?php require_once __DIR__ . '/../Lib/Security.php'; ?>
+
+    <?php if (!empty($_SESSION['flash_error'])): ?>
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 15px;border-radius:8px;margin-bottom:18px;background:#fdecea;color:#d93025;text-align:left;">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span><?php echo htmlspecialchars($_SESSION['flash_error']); unset($_SESSION['flash_error']); ?></span>
+      </div>
+    <?php endif; ?>
+
+    <?php if (!empty($_SESSION['flash_success'])): ?>
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 15px;border-radius:8px;margin-bottom:18px;background:#e9f7ef;color:#1e7e34;text-align:left;">
+        <i class="fa-solid fa-circle-check"></i>
+        <span><?php echo htmlspecialchars($_SESSION['flash_success']); unset($_SESSION['flash_success']); ?></span>
+      </div>
+    <?php endif; ?>
     
     <form action="/register" method="post" class="register-form">
       <?php echo Security::csrfField(); ?>

@@ -12,7 +12,12 @@ class AdminController {
 
     public function __construct(){
         Security::ensureSession();
-        if (!isset($_SESSION['user_id']) || ($_SESSION['user_role'] ?? '') !== 'admin'){
+        $requestedPath = trim((string)($_GET['url'] ?? ''), '/');
+        $isStopImpersonationRoute = $requestedPath === 'admin/stop-impersonation';
+        $isEffectiveAdmin = ($_SESSION['user_role'] ?? '') === 'admin';
+        $canStopImpersonation = $isStopImpersonationRoute && !empty($_SESSION['impersonator_admin_state']);
+
+        if (!isset($_SESSION['user_id']) || (!$isEffectiveAdmin && !$canStopImpersonation)){
             $_SESSION['flash_error'] = "Admin access required.";
             header('Location:/dashboard');
             exit();
@@ -196,32 +201,55 @@ class AdminController {
 
     public function impersonate($id){
         $this->checkCsrf();
-        if ($id == $_SESSION['user_id']) {
+        $targetUser = $this->userModel->findUserById((int)$id);
+        if (!$targetUser) {
+            $_SESSION['flash_error'] = "User not found.";
+            $this->redirectBack();
+        }
+
+        if ((int)$id === (int)$_SESSION['user_id']) {
             $_SESSION['flash_error'] = "Cannot impersonate yourself.";
             $this->redirectBack();
         }
 
-        if (empty($_SESSION['impersonator_admin_id'])) {
-            $_SESSION['impersonator_admin_id'] = $_SESSION['user_id'];
+        if (empty($_SESSION['impersonator_admin_state'])) {
+            $_SESSION['impersonator_admin_state'] = [
+                'user_id' => $_SESSION['user_id'],
+                'user_name' => $_SESSION['user_name'] ?? '',
+                'user_email' => $_SESSION['user_email'] ?? '',
+                'user_profile_code' => $_SESSION['user_profile_code'] ?? '',
+                'user_role' => $_SESSION['user_role'] ?? 'admin',
+            ];
         }
 
-        $_SESSION['user_id'] = $id;
+        $_SESSION['impersonator_admin_id'] = $_SESSION['impersonator_admin_state']['user_id'];
+        $_SESSION['impersonated_user_id'] = $targetUser->id;
+        $this->hydrateSessionFromUser($targetUser);
+
         $this->logger->logAdminAction($_SESSION['impersonator_admin_id'], 'start_impersonation', ['target_id' => $id]);
-        $_SESSION['flash_success'] = "Now viewing as user ID: $id";
+        $_SESSION['flash_success'] = "Now viewing as {$targetUser->name}.";
         header('Location: /dashboard');
         exit();
     }
 
     public function stopImpersonation(){
-        if (!empty($_SESSION['impersonator_admin_id'])) {
-            $adminId = $_SESSION['impersonator_admin_id'];
+        $this->checkCsrf();
+        if (!empty($_SESSION['impersonator_admin_state'])) {
+            $adminState = $_SESSION['impersonator_admin_state'];
+            $adminId = (int)$adminState['user_id'];
+            $impersonatedUserId = (int)($_SESSION['impersonated_user_id'] ?? 0);
 
             $_SESSION['user_id'] = $adminId;
-            $_SESSION['user_role'] = 'admin';
+            $_SESSION['user_name'] = $adminState['user_name'];
+            $_SESSION['user_email'] = $adminState['user_email'];
+            $_SESSION['user_profile_code'] = $adminState['user_profile_code'];
+            $_SESSION['user_role'] = $adminState['user_role'];
 
-            $this->logger->logAdminAction($adminId, 'stop_impersonation', ['target_id' => $_SESSION['user_id']]);
+            $this->logger->logAdminAction($adminId, 'stop_impersonation', ['target_id' => $impersonatedUserId]);
 
             unset($_SESSION['impersonator_admin_id']);
+            unset($_SESSION['impersonator_admin_state']);
+            unset($_SESSION['impersonated_user_id']);
 
             $_SESSION['flash_success'] = "Welcome back, Admin.";
             header('Location: /admin');
@@ -392,6 +420,14 @@ class AdminController {
         }
         header('Location:/admin?tab=settings');
         exit();
+    }
+
+    private function hydrateSessionFromUser(object $user): void {
+        $_SESSION['user_id'] = $user->id;
+        $_SESSION['user_name'] = $user->name;
+        $_SESSION['user_email'] = $user->email ?? '';
+        $_SESSION['user_profile_code'] = $user->profile_code ?? '';
+        $_SESSION['user_role'] = $user->role ?? 'user';
     }
 }
 ?>

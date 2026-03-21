@@ -37,7 +37,7 @@ $net_balance = $total_owed_to_you - $total_you_owe;
         <span class="label">Net Balance</span>
         <strong class="value <?php echo $net_balance < 0 ? 'text-danger' : 'text-success'; ?>">
             ৳<?php echo number_format(abs($net_balance), 2); ?>
-            <small><?php echo $net_balance < 0 ? '(You Owe)' : '(Owed To You)'; ?></small>
+            <small><?php echo $net_balance < 0 ? '(You Owe)' : ($net_balance > 0 ? '(Owed To You)' : '(Settled)'); ?></small>
         </strong>
     </div>
 </div>
@@ -100,10 +100,8 @@ $net_balance = $total_owed_to_you - $total_you_owe;
 
 
 <style>
-    :root { text-danger-color: var(--danger-color); text-success-color: var(--success-color); }
-    .dark-theme { text-danger-color: var(--danger-text); text-success-color: var(--success-text); }
-    .text-danger { color: var(--text-danger-color); }
-    .text-success { color: var(--text-success-color); }
+    .text-danger { color: var(--danger-color); }
+    .text-success { color: var(--success-color); }
 
     .page-header h1 { margin: 0 0 4px 0; color: var(--text-primary); }
     .page-header .subtitle { color: var(--text-secondary); margin: 0 0 24px 0; }
@@ -150,7 +148,7 @@ $net_balance = $total_owed_to_you - $total_you_owe;
         background-color: var(--card-bg); box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
         padding: 16px 0; border-top: 1px solid var(--card-border); z-index: 10;
     }
-    .dark-theme .settle-summary-bar { box-shadow: 0 -4px 12px rgba(0,0,0,0.4); }
+    [data-theme="dark"] .settle-summary-bar { box-shadow: 0 -4px 12px rgba(0,0,0,0.4); }
     .summary-content { display: flex; justify-content: space-between; align-items: center; }
     .selection-info strong { display: block; color: var(--text-primary); font-size: 1.1rem; }
     .selection-info span { color: var(--text-secondary); }
@@ -183,9 +181,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (checkbox.checked) {
                 selectedCount++;
                 netSelectedAmount += parseFloat(item.dataset.amount);
-                item.style.backgroundColor = 'var(--nav-link-hover-bg)'; // Visual feedback
+                item.classList.add('selected');
             } else {
-                item.style.backgroundColor = 'transparent';
+                item.classList.remove('selected');
             }
         });
 
@@ -193,7 +191,9 @@ document.addEventListener('DOMContentLoaded', () => {
             summaryBar.style.display = 'block';
             selectedCountEl.textContent = `${selectedCount} item${selectedCount > 1 ? 's' : ''} selected`;
             
-            const actionText = netSelectedAmount > 0 ? 'Net you receive' : 'Net you pay';
+            const actionText = netSelectedAmount > 0
+                ? 'Net you receive'
+                : (netSelectedAmount < 0 ? 'Net you pay' : 'Net balance');
             selectedTotalEl.textContent = `${actionText}: ৳${Math.abs(netSelectedAmount).toFixed(2)}`;
             
             submitBtn.disabled = false;

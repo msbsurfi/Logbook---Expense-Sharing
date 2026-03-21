@@ -1,7 +1,7 @@
 <?php
 class Transaction {
     private $db;
-    public function __construct(){ $this->db = new Database(); }
+    public function __construct(?Database $db = null){ $this->db = $db ?? new Database(); }
 
     public function createTransaction($lenderId,$borrowerId,$amount,$description,$expenseId=null,$createdBy=0): int|false {
         $this->db->query("INSERT INTO transactions (created_by,lender_id,borrower_id,amount,description,expense_id) VALUES (:cb,:l,:b,:amt,:d,:eid)");
@@ -20,9 +20,9 @@ class Transaction {
 
     public function markTransactionAsPaid($txnId,$actorId){
         $this->db->query("UPDATE transactions t
-            JOIN (SELECT 1 FROM transactions WHERE id=:id AND (lender_id=:uid OR borrower_id=:uid)) x
+            JOIN (SELECT 1 FROM transactions WHERE id=:id AND status='unpaid' AND (lender_id=:uid OR borrower_id=:uid)) x
             SET t.status='paid', t.paid_at=NOW(), t.settled_by=:actor, t.settled_at=NOW()
-            WHERE t.id=:id");
+            WHERE t.id=:id AND t.status='unpaid'");
         $this->db->bind(':id',$txnId);
         $this->db->bind(':uid',$actorId);
         $this->db->bind(':actor',$actorId);

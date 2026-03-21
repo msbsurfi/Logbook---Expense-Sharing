@@ -441,8 +441,9 @@ $activeTab = $data['tab'] ?? 'dashboard';
     fetch('/admin/analytics-data')
         .then(r => r.json())
         .then(data => {
-            if(!data || !data.labels) return;
-            new Chart(document.getElementById('txCountChart'), {
+            const canvas = document.getElementById('txCountChart');
+            if (!canvas || !window.Chart || !data || !data.labels) return;
+            new Chart(canvas, {
                 type: 'line',
                 data: {
                     labels: data.labels,
@@ -461,7 +462,8 @@ $activeTab = $data['tab'] ?? 'dashboard';
                     scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { display: false } }
                 }
             });
-        });
+        })
+        .catch(() => {});
 </script>
 <?php endif; ?>
 

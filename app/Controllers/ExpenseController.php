@@ -41,9 +41,18 @@ class ExpenseController {
 
         $participants = array_filter(array_map('intval', $_POST['participants'] ?? []), fn($v) => $v > 0);
         $allIds = array_values(array_unique($participants));
+        $allowedParticipantIds = $this->friendModel->getAcceptedFriendIds($creatorId);
 
         if (!in_array($creatorId, $allIds)) {
             $allIds[] = $creatorId;
+        }
+
+        foreach ($allIds as $participantId) {
+            if ($participantId !== $creatorId && !in_array($participantId, $allowedParticipantIds, true)) {
+                $_SESSION['flash_error'] = 'One or more selected participants are not in your friends list.';
+                header('Location:/expenses/create');
+                return;
+            }
         }
 
         if (!$description || $totalAmount <= 0 || count($allIds) < 2){
@@ -105,37 +114,52 @@ class ExpenseController {
 
         $minimizedTxns = $this->minimizeDebts($netBalances);
 
-        $eid = $this->expenseModel->createExpense($description, $totalAmount, $creatorId);
-        if (!$eid){
-            $_SESSION['flash_error'] = 'Could not create expense.';
-            header('Location:/expenses/create');
-            return;
-        }
-
         $db = new Database();
-        foreach ($allIds as $pid) {
-            $isPayer = $paidAmounts[$pid] > 0 ? 1 : 0;
-            $db->query("INSERT INTO expense_participants (expense_id,user_id,share,is_payer) VALUES (:e,:u,:s,:p)");
-            $db->bind(':e', $eid);
-            $db->bind(':u', $pid);
-            $db->bind(':s', $shares[$pid]);
-            $db->bind(':p', $isPayer);
-            $db->execute();
-        }
-
+        $expenseModel = new Expense($db);
+        $transactionModel = new Transaction($db);
         $createdTxnIds = [];
-        foreach ($minimizedTxns as $txn) {
-            $newId = $this->transactionModel->createTransaction(
-                $txn['lender'],
-                $txn['borrower'],
-                round($txn['amount'], 2),
-                $description,
-                $eid,
-                $creatorId
-            );
-            if ($newId !== false) {
+
+        try {
+            $db->beginTransaction();
+
+            $eid = $expenseModel->createExpense($description, $totalAmount, $creatorId);
+            if (!$eid){
+                throw new RuntimeException('Could not create expense.');
+            }
+
+            foreach ($allIds as $pid) {
+                $isPayer = $paidAmounts[$pid] > 0 ? 1 : 0;
+                $db->query("INSERT INTO expense_participants (expense_id,user_id,share,is_payer) VALUES (:e,:u,:s,:p)");
+                $db->bind(':e', $eid);
+                $db->bind(':u', $pid);
+                $db->bind(':s', $shares[$pid]);
+                $db->bind(':p', $isPayer);
+                if (!$db->execute()) {
+                    throw new RuntimeException('Could not save expense participants.');
+                }
+            }
+
+            foreach ($minimizedTxns as $txn) {
+                $newId = $transactionModel->createTransaction(
+                    $txn['lender'],
+                    $txn['borrower'],
+                    round($txn['amount'], 2),
+                    $description,
+                    $eid,
+                    $creatorId
+                );
+                if ($newId === false) {
+                    throw new RuntimeException('Could not create optimized transactions.');
+                }
                 $createdTxnIds[] = $newId;
             }
+
+            $db->commit();
+        } catch (Throwable $e) {
+            $db->rollBack();
+            $_SESSION['flash_error'] = 'Could not create expense right now.';
+            header('Location:/expenses/create');
+            return;
         }
 
         $this->sendGroupExpenseEmails($eid, $allIds, $description, $totalAmount, $shares, $paidAmounts, $createdTxnIds, $creatorId);

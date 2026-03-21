@@ -7,6 +7,7 @@ class TransactionController {
     private Transaction $transactionModel;
     private User $userModel;
     private Notification $notificationModel;
+    private Friend $friendModel;
 
     public function __construct(){
         Security::ensureSession();
@@ -14,6 +15,7 @@ class TransactionController {
         $this->transactionModel = new Transaction();
         $this->userModel = new User();
         $this->notificationModel = new Notification();
+        $this->friendModel = new Friend();
     }
 
     public function create(){
@@ -30,6 +32,11 @@ class TransactionController {
 
         if (!$friendId || $amount <= 0 || $description === ''){
             $_SESSION['flash_error']="All fields required and amount must be positive."; header('Location:/dashboard'); return;
+        }
+
+        if (!$this->friendModel->areFriends($currentUserId, $friendId)) {
+            $_SESSION['flash_error'] = 'You can only create direct transactions with accepted friends.';
+            header('Location:/dashboard'); return;
         }
 
         $lenderId   = $iOweFlag ? $friendId : $currentUserId;
@@ -106,9 +113,15 @@ class TransactionController {
         $friendId = (int)$friendId;
         $friend = $this->userModel->findUserById($friendId);
         if (!$friend){ $_SESSION['flash_error']="User not found."; header('Location:/dashboard'); return; }
+        $transactions = $this->transactionModel->getUnpaidTransactionsWithFriend($userId, $friendId);
+        if (!$this->friendModel->areFriends($userId, $friendId) && empty($transactions)) {
+            $_SESSION['flash_error'] = 'You can only settle balances with accepted friends.';
+            header('Location:/dashboard');
+            return;
+        }
         $data = [
             'friend' => $friend,
-            'transactions' => $this->transactionModel->getUnpaidTransactionsWithFriend($userId, $friendId),
+            'transactions' => $transactions,
         ];
         require_once __DIR__ . '/../Views/transactions/settle.php';
     }

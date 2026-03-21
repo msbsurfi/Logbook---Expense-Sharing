@@ -63,4 +63,19 @@ class Database {
     public function getLastError(): ?string {
         return $this->lastError;
     }
+
+    public function beginTransaction(): bool {
+        return $this->dbh->beginTransaction();
+    }
+
+    public function commit(): bool {
+        return $this->dbh->commit();
+    }
+
+    public function rollBack(): bool {
+        if (!$this->dbh->inTransaction()) {
+            return false;
+        }
+        return $this->dbh->rollBack();
+    }
 }

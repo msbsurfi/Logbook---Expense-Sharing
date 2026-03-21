@@ -19,6 +19,33 @@ class UserController {
         require_once __DIR__ . '/../Views/login.php';
     }
 
+    public function showForgotPasswordForm(){
+        require_once __DIR__ . '/../Views/forget-password.php';
+    }
+
+    public function showResetPasswordForm(){
+        $token = trim($_GET['token'] ?? '');
+        if ($token === '') {
+            $_SESSION['flash_error'] = 'The password reset link is invalid or has expired.';
+            header('Location:/forgot-password');
+            return;
+        }
+
+        $tokenHash = hash('sha256', $token);
+        $resetRequest = $this->userModel->findPasswordResetByTokenHash($tokenHash);
+        if (!$resetRequest) {
+            $_SESSION['flash_error'] = 'The password reset link is invalid or has expired.';
+            header('Location:/forgot-password');
+            return;
+        }
+
+        $data = [
+            'token' => $token,
+            'name' => $resetRequest->name ?? 'User',
+        ];
+        require_once __DIR__ . '/../Views/reset-password.php';
+    }
+
     public function register(){
         if ($_SERVER['REQUEST_METHOD'] !== 'POST'){
             header('Location:/register'); return;
@@ -28,15 +55,36 @@ class UserController {
             header('Location:/register'); return;
         }
 
-        $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
         $name     = trim($_POST['name'] ?? '');
         $emailRaw = trim($_POST['email'] ?? '');
         $email    = strtolower($emailRaw);
         $phone    = trim($_POST['phone'] ?? '');
         $password = trim($_POST['password'] ?? '');
+        $honeypot = trim($_POST['website_url'] ?? '');
+        $acceptedTerms = !empty($_POST['terms']);
+
+        if ($honeypot !== '') {
+            header('Location:/register');
+            return;
+        }
 
         if (!$name || !$email || !$password){
             $_SESSION['flash_error'] = 'All required fields must be filled.';
+            header('Location:/register'); return;
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $_SESSION['flash_error'] = 'Please enter a valid email address.';
+            header('Location:/register'); return;
+        }
+
+        if (!$acceptedTerms) {
+            $_SESSION['flash_error'] = 'You must accept the terms and conditions to register.';
+            header('Location:/register'); return;
+        }
+
+        if (strlen($password) < 8) {
+            $_SESSION['flash_error'] = 'Password must be at least 8 characters long.';
             header('Location:/register'); return;
         }
 
@@ -176,9 +224,12 @@ class UserController {
             $_SESSION['flash_error'] = 'Invalid security token.';
             header('Location:/login'); return;
         }
-        $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
         $email = strtolower(trim($_POST['email'] ?? ''));
         $password = trim($_POST['password'] ?? '');
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $_SESSION['flash_error']='Invalid credentials.'; header('Location:/login'); return;
+        }
 
         $user = $this->userModel->findUserByEmail($email);
         if (!$user){
@@ -200,12 +251,108 @@ class UserController {
             $_SESSION['flash_error']='Invalid credentials.'; header('Location:/login'); return;
         }
 
-        $_SESSION['user_id']          = $user->id;
-        $_SESSION['user_name']        = $user->name;
-        $_SESSION['user_profile_code']= $user->profile_code;
-        $_SESSION['user_role']        = $user->role;
+        session_regenerate_id(true);
+        $this->setAuthenticatedSession($user);
         $_SESSION['flash_success']    = 'Login successful.';
         header('Location:/dashboard');
+    }
+
+    public function sendPasswordReset(){
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST'){
+            header('Location:/forgot-password'); return;
+        }
+        if (!Security::validateCsrf($_POST['csrf_token'] ?? '')){
+            $_SESSION['flash_error'] = 'Invalid security token.';
+            header('Location:/forgot-password'); return;
+        }
+
+        $email = strtolower(trim($_POST['email'] ?? ''));
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $_SESSION['flash_error'] = 'Please enter a valid email address.';
+            header('Location:/forgot-password'); return;
+        }
+
+        $user = $this->userModel->findUserByEmail($email);
+        if ($user && !$user->banned_at && !$user->rejected_at) {
+            $token = bin2hex(random_bytes(32));
+            $tokenHash = hash('sha256', $token);
+            $expiresAt = (new DateTime('+1 hour'))->format('Y-m-d H:i:s');
+
+            if (!$this->userModel->createPasswordReset($user->email, $tokenHash, $expiresAt)) {
+                $_SESSION['flash_error'] = 'Unable to create a password reset request right now.';
+                header('Location:/forgot-password'); return;
+            }
+
+            $resetUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']==='on' ? 'https' : 'http')
+                . '://' . $_SERVER['HTTP_HOST'] . '/reset-password?token=' . urlencode($token);
+
+            $resetBtn = "<div style='text-align:center;margin:24px 0;'><a href='{$resetUrl}' style='background-color:#b8860b;color:#fff;padding:14px 32px;border-radius:999px;text-decoration:none;font-weight:700;font-size:16px;display:inline-block;'>Reset My Password</a></div>";
+            $html = EmailTemplate::generate(
+                'Reset Your Logbook Password',
+                $user->name,
+                'We received a request to reset your Logbook password.',
+                $resetBtn . 'This link expires in 1 hour. If you did not request a password reset, you can ignore this email.',
+                [
+                    'Email' => htmlspecialchars($user->email),
+                    'Expires In' => '1 hour',
+                ]
+            );
+
+            $mailer = new Mailer();
+            $mailer->send($user->email, $user->name, 'Reset Your Logbook Password', $html);
+            $this->userModel->logEmail($user->id, $user->email, 'Reset Your Logbook Password');
+        }
+
+        $_SESSION['flash_success'] = 'If that email exists in our system, a reset link has been sent.';
+        header('Location:/forgot-password');
+    }
+
+    public function resetPassword(){
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST'){
+            header('Location:/forgot-password'); return;
+        }
+        if (!Security::validateCsrf($_POST['csrf_token'] ?? '')){
+            $_SESSION['flash_error'] = 'Invalid security token.';
+            header('Location:/forgot-password'); return;
+        }
+
+        $token = trim($_POST['token'] ?? '');
+        $password = trim($_POST['password'] ?? '');
+        $confirmPassword = trim($_POST['password_confirmation'] ?? '');
+
+        if ($token === '') {
+            $_SESSION['flash_error'] = 'The password reset link is invalid or has expired.';
+            header('Location:/forgot-password'); return;
+        }
+
+        if (strlen($password) < 8) {
+            $_SESSION['flash_error'] = 'Password must be at least 8 characters long.';
+            header('Location:/reset-password?token=' . urlencode($token)); return;
+        }
+
+        if ($password !== $confirmPassword) {
+            $_SESSION['flash_error'] = 'Passwords do not match.';
+            header('Location:/reset-password?token=' . urlencode($token)); return;
+        }
+
+        $tokenHash = hash('sha256', $token);
+        $resetRequest = $this->userModel->findPasswordResetByTokenHash($tokenHash);
+        if (!$resetRequest) {
+            $_SESSION['flash_error'] = 'The password reset link is invalid or has expired.';
+            header('Location:/forgot-password'); return;
+        }
+
+        $passwordHash = password_hash($password, PASSWORD_DEFAULT);
+        if (
+            !$this->userModel->updatePasswordByEmail($resetRequest->email, $passwordHash) ||
+            !$this->userModel->deletePasswordReset($tokenHash)
+        ) {
+            $_SESSION['flash_error'] = 'Unable to reset your password right now.';
+            header('Location:/reset-password?token=' . urlencode($token)); return;
+        }
+
+        $_SESSION['flash_success'] = 'Your password has been updated. You can sign in now.';
+        header('Location:/login');
     }
 
     public function logout(){
@@ -239,5 +386,13 @@ class UserController {
             'totalOwedToYou'=>$totalOwedToYou
         ];
         require_once __DIR__ . '/../Views/dashboard.php';
+    }
+
+    private function setAuthenticatedSession(object $user): void {
+        $_SESSION['user_id'] = $user->id;
+        $_SESSION['user_name'] = $user->name;
+        $_SESSION['user_email'] = $user->email ?? '';
+        $_SESSION['user_profile_code'] = $user->profile_code ?? '';
+        $_SESSION['user_role'] = $user->role ?? 'user';
     }
 }

@@ -285,12 +285,17 @@ require_once __DIR__ . '/../../Lib/Security.php';
         }
     });
 
-    // Close on click outside
-    window.onclick = function(event) {
-        if (event.target == modal) {
+    document.addEventListener('click', function(event) {
+        if (event.target === modal) {
             closeUnfriendModal();
         }
-    }
+    });
+
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && modal.style.display === 'flex') {
+            closeUnfriendModal();
+        }
+    });
 </script>
 
 <?php require_once __DIR__ . '/../layouts/footer.php'; ?>

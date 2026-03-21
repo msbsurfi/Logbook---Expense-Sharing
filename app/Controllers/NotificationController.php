@@ -2,7 +2,7 @@
 class NotificationController {
     private $notificationModel;
     public function __construct(){
-        session_start();
+        Security::ensureSession();
         if (!isset($_SESSION['user_id'])){
             header('HTTP/1.1 403 Forbidden');
             echo json_encode(['error'=>'Not logged in']);
@@ -23,6 +23,11 @@ class NotificationController {
     }
 
     public function markRead(){
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !Security::validateCsrf($_POST['csrf_token'] ?? '')) {
+            header('HTTP/1.1 400 Bad Request');
+            echo json_encode(['status' => 'error', 'message' => 'Invalid security token']);
+            return;
+        }
         $id = (int)($_POST['id'] ?? 0);
         if ($id) $this->notificationModel->markRead($_SESSION['user_id'],$id);
         echo json_encode(['status'=>'ok']);

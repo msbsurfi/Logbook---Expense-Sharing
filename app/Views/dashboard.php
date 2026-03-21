@@ -137,36 +137,6 @@ require_once __DIR__ . '/../Lib/Security.php';
 <style>
     /* --- DASHBOARD STYLES --- */
 
-    /* --- Light Theme Variables --- */
-    :root {
-        --body-bg: #111827;
-        --card-bg: #1f2937;
-        --card-border: #374151;
-        --input-bg: #374151;
-        --success-color: #22c55e; /* Main color */
-        --success-bg: #164e32;    /* Light background */
-        --success-text: #6ee7b7;  /* Darker text */
-        --danger-color: #ef4444;  /* Main color */
-        --danger-bg: #5f1818;     /* Light background */
-        --danger-text: #fca5a5;   /* Darker text */
-    }
-
-    /* --- Dark Theme Variables --- */
-    body.dark-theme {
-        --body-bg: #111827;
-        --card-bg: #1f2937;
-        --card-border: #374151;
-        --input-bg: #374151;
-        --success-color: #22c55e;
-        --success-bg: #164e32;
-        --success-text: #6ee7b7;
-        --danger-color: #ef4444;
-        --danger-bg: #5f1818;
-        --danger-text: #fca5a5;
-    }
-    
-    body { background-color: var(--body-bg); }
-
     /* --- Page Header --- */
     .dashboard-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
     .dashboard-header h1 { margin: 0 0 4px 0; color: var(--text-primary); }

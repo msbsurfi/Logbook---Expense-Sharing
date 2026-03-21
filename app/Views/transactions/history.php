@@ -21,7 +21,7 @@ require_once __DIR__ . '/../layouts/header.php'; // Your modern, theme-aware hea
     
     <!-- This wrapper enables horizontal scrolling on mobile -->
     <div class="table-wrapper">
-        <table id="history-table" class="display nowrap" style="width:100%">
+        <table id="history-table" class="history-table" style="width:100%">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -82,7 +82,7 @@ require_once __DIR__ . '/../layouts/header.php'; // Your modern, theme-aware hea
         --warning-text: #854d0e;
         --warning-border: #facc15;
     }
-    .dark-theme {
+    [data-theme="dark"] {
         --warning-bg: #42310b;
         --warning-text: #fef08a;
     }
@@ -108,21 +108,12 @@ require_once __DIR__ . '/../layouts/header.php'; // Your modern, theme-aware hea
     #history-table { border-collapse: collapse !important; }
     #history-table thead th {
         color: var(--text-secondary); text-align: left; white-space: nowrap;
-        cursor: pointer; user-select: none;
+        user-select: none;
     }
-    #history-table thead th:hover { color: var(--text-primary); }
     #history-table tbody td {
         color: var(--text-primary); padding: 12px 16px !important; border-top: 1px solid var(--card-border);
         white-space: nowrap;
     }
-    
-    /* Theme-aware DataTable Controls Styling */
-    .dataTables_wrapper .dataTables_paginate .paginate_button { background: transparent !important; color: var(--text-secondary) !important; border: 1px solid var(--card-border) !important; }
-    .dataTables_wrapper .dataTables_paginate .paginate_button:hover { background: var(--input-bg) !important; border-color: var(--text-secondary) !important; color: var(--text-primary) !important; }
-    .dataTables_wrapper .dataTables_paginate .paginate_button.current, 
-    .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover { background: var(--brand-color) !important; color: white !important; border-color: var(--brand-color) !important; }
-    .dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_info { color: var(--text-secondary) !important; font-size: 0.9rem; }
-    .dataTables_wrapper select { background-color: var(--input-bg) !important; color: var(--text-primary) !important; border-color: var(--card-border) !important; }
 
     /* Badge Styles */
     .badge { padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; white-space: nowrap; }
@@ -137,46 +128,24 @@ require_once __DIR__ . '/../layouts/header.php'; // Your modern, theme-aware hea
     .empty-state span { color: var(--text-secondary); }
 </style>
 
-<?php
-// Define the page-specific scripts to be injected into the footer
-ob_start();
-?>
 <script>
-// Use the jQuery document ready function to ensure the library is loaded
-$(document).ready(function() {
-    var table = $('#history-table').DataTable({
-        // Disable the default responsive behavior that collapses columns
-        responsive: false,
-        
-        // Enable horizontal scrolling
-        scrollX: true,
-        
-        // Order by the 'Date Created' column (index 5), descending
-        order: [[5, 'desc']],
-        
-        // Customize the layout of controls (remove default search 'f')
-        dom: 'rt<"datatable-footer"lip>',
-        
-        language: {
-            "zeroRecords": " ", // Let our empty-state div handle this message
-            "paginate": {
-                "previous": "<i class='fa-solid fa-chevron-left'></i>",
-                "next": "<i class='fa-solid fa-chevron-right'></i>"
-            }
-        }
-    });
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('history-search-input');
+    const rows = Array.from(document.querySelectorAll('#history-table tbody tr'));
 
-    // Hook up our custom search input to the DataTable's search API
-    $('#history-search-input').on('keyup', function() {
-        table.search(this.value).draw();
+    if (!searchInput || rows.length === 0) {
+        return;
+    }
+
+    searchInput.addEventListener('input', () => {
+        const term = searchInput.value.trim().toLowerCase();
+
+        rows.forEach((row) => {
+            const visible = term === '' || row.textContent.toLowerCase().includes(term);
+            row.style.display = visible ? '' : 'none';
+        });
     });
 });
 </script>
-<?php
-$page_scripts = ob_get_clean(); // Capture the script output into a variable
-?>
 
-<?php
-// Include the footer, which will now print the `$page_scripts` variable
-require_once __DIR__ . '/../layouts/footer.php';
-?>
+<?php require_once __DIR__ . '/../layouts/footer.php'; ?>
