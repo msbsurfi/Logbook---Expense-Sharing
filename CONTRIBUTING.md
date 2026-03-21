@@ -1,6 +1,6 @@
 # Contributing to Logbook
 
-Thank you for your interest in Logbook. Because this is **proprietary software** owned by MD Shifat Bin Siddique Urfi, contributions are handled differently from typical open-source projects. Please read the following guidelines carefully before submitting anything.
+Thank you for your interest in contributing to Logbook! Contributions of all kinds are welcome — bug reports, feature requests, documentation improvements, and code changes.
 
 ---
 
@@ -23,7 +23,7 @@ All participants are expected to maintain a respectful, professional environment
 
 ## Reporting Bugs
 
-If you discover a bug, please open an issue in your repository tracker, for example `https://YOURDOMAIN/issues`, and include:
+If you discover a bug, please [open an issue](https://github.com/msbsurfi/Logbook---Expense-Sharing/issues) and include:
 
 1. A clear, descriptive title.
 2. Steps to reproduce the bug.
@@ -31,7 +31,7 @@ If you discover a bug, please open an issue in your repository tracker, for exam
 4. Your environment: PHP version, MySQL version, web server, OS.
 5. Relevant error messages or screenshots.
 
-> **Security vulnerabilities** must **not** be reported publicly. Please contact the owner directly via the information in the [LICENSE](LICENSE) file.
+> **Security vulnerabilities** should **not** be reported publicly. Please open a [GitHub Security Advisory](https://github.com/msbsurfi/Logbook---Expense-Sharing/security/advisories/new) or contact the maintainer directly.
 
 ---
 
@@ -47,14 +47,6 @@ Feature requests are welcome. Open an issue with the label `enhancement` and des
 
 ## Submitting Code Changes
 
-Because the Software is proprietary, all contributions require **explicit written permission** from the owner. Before starting work on any change:
-
-1. Open an issue describing the change you wish to make.
-2. Wait for approval from the repository owner.
-3. Only proceed with implementation once you have written permission.
-
-If approved:
-
 1. **Fork** the repository and create a descriptive branch:
    ```bash
    git checkout -b fix/issue-123-transaction-balance
@@ -64,8 +56,6 @@ If approved:
 4. Commit using the [Commit Message Format](#commit-message-format).
 5. Open a **Pull Request** targeting the `main` branch.
 6. Reference the related issue in the PR description.
-
-By submitting a pull request, you agree to assign all rights to your contribution to MD Shifat Bin Siddique Urfi.
 
 ---
 
@@ -101,6 +91,3 @@ fix(auth): correct rate-limit check in resend verification
 docs: update README installation steps
 ```
 
----
-
-*Logbook is copyright © 2024 MD Shifat Bin Siddique Urfi. All rights reserved.*

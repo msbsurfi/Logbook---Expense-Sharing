@@ -10,7 +10,7 @@
 
 <p align="center">
   <img alt="PHP Version" src="https://img.shields.io/badge/PHP-%3E%3D8.0-777BB4?logo=php&logoColor=white" />
-  <img alt="License" src="https://img.shields.io/badge/License-Proprietary-red" />
+  <img alt="License" src="https://img.shields.io/badge/License-MIT-green" />
   <img alt="MySQL" src="https://img.shields.io/badge/Database-MySQL-4479A1?logo=mysql&logoColor=white" />
   <img alt="Apache" src="https://img.shields.io/badge/Server-Apache-D22128?logo=apache&logoColor=white" />
 </p>
@@ -36,9 +36,7 @@
 
 ## Overview
 
-**Logbook** (also known as *Halkhata*) is a lightweight, self-contained PHP web application that helps groups of friends or colleagues **track shared expenses**, **split bills**, and **settle debts** seamlessly. It features a custom MVC architecture built without any heavyweight framework, relying only on PHP 8, MySQL, and PHPMailer.
-
-The system supports multi-user collaboration with friend networks, real-time notifications, an administrative control panel, and email-based verification — all in a clean, straightforward codebase.
+**Logbook** (also known as *Halkhata*) is a lightweight PHP web application for tracking shared expenses, splitting bills, and settling debts. It uses a custom MVC architecture with PHP 8, MySQL, and PHPMailer — no heavy framework required.
 
 ---
 
@@ -180,8 +178,8 @@ Logbook/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://YOURDOMAIN/repository.git
-cd Logbook
+git clone https://github.com/msbsurfi/Logbook---Expense-Sharing.git
+cd Logbook---Expense-Sharing
 ```
 
 ### 2. Install PHP Dependencies
@@ -192,11 +190,11 @@ composer install
 
 ### 3. Set the Document Root
 
-Configure your Apache virtual host or your hosting control panel to point the document root to the `public/` directory:
+Configure your Apache virtual host to point the document root to the `public/` directory:
 
 ```apache
 <VirtualHost *:80>
-    ServerName YOURDOMAIN
+    ServerName yourdomain.com
     DocumentRoot /path/to/Logbook/public
 
     <Directory /path/to/Logbook/public>
@@ -239,27 +237,27 @@ Add the following cron entry to send periodic email summaries:
 
 ```php
 <?php
-define('DB_HOST', 'YOURDOMAIN');
+define('DB_HOST', 'localhost');
 define('DB_PORT', 3306);
-define('DB_USER', 'YOURDOMAIN');
-define('DB_PASS', 'YOURDOMAIN');
-define('DB_NAME', 'YOURDOMAIN');
+define('DB_USER', 'db_user');
+define('DB_PASS', 'db_password');
+define('DB_NAME', 'logbook');
 ```
 
 ### `config/mail.php`
 
 ```php
 <?php
-define('SMTP_HOST', 'mail.YOURDOMAIN');
-define('SMTP_USER', 'noreply@YOURDOMAIN');
-define('SMTP_PASS', 'YOURDOMAIN');
+define('SMTP_HOST', 'mail.example.com');
+define('SMTP_USER', 'noreply@example.com');
+define('SMTP_PASS', 'smtp_password');
 define('SMTP_PORT', 465);
-define('SMTP_FROM_EMAIL', 'noreply@YOURDOMAIN');
+define('SMTP_FROM_EMAIL', 'noreply@example.com');
 define('SMTP_FROM_NAME', 'Logbook');
 define('SMTP_SECURE', 'ssl');
 ```
 
-The installer writes both files for you. These placeholder values are intentionally non-functional so the public repository does not expose real credentials or domains.
+The installer writes both files for you. Replace the placeholder values with your own credentials — never commit real credentials to version control.
 
 ---
 
@@ -348,12 +346,10 @@ The application employs several security measures:
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on submitting issues, suggesting features, and opening pull requests.
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on reporting bugs, requesting features, and opening pull requests.
 
 ---
 
 ## License
 
-Copyright © 2024 **MD Shifat Bin Siddique Urfi**. All rights reserved.
-
-This software and all associated source code, documentation, and assets are the exclusive intellectual property of MD Shifat Bin Siddique Urfi. See the [LICENSE](LICENSE) file for full terms.
+This project is licensed under the [MIT License](LICENSE). It is free for personal use and open for developer contributions.
