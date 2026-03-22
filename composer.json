@@ -1,6 +1,6 @@
 {
-  "name": "msbsurfi/halkhata",
-  "description": "Halkhata debt management system",
+  "name": "msbsurfi/logbook",
+  "description": "Logbook debt management system",
   "require": {
     "php": ">=8.0",
     "phpmailer/phpmailer": "^6.8"
